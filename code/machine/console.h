@@ -24,6 +24,9 @@
 // All rights reserved.  See copyright.h for copyright notice and limitation 
 // of liability and disclaimer of warranty provisions.
 
+// Record --------------------------------------------------------
+// 2015/10/1 : Implement PrintString() to do console string output.
+// end Record ----------------------------------------------------
 #ifndef CONSOLE_H
 #define CONSOLE_H
 

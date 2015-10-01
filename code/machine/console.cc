@@ -11,6 +11,9 @@
 // Copyright (c) 1992-1996 The Regents of the University of California.
 // All rights reserved.  See copyright.h for copyright notice and limitation 
 // of liability and disclaimer of warranty provisions.
+// Record --------------------------------------------------------
+// 2015/10/1 : Implement PrintString() to do console string output.
+// end Record ----------------------------------------------------
 
 #include "copyright.h"
 #include "console.h"
@@ -173,6 +176,11 @@ ConsoleOutput::PutChar(char ch)
 }
 
 
+//----------------------------------------------------------------------
+// ConsoleOutput::PrintString()
+// 	Write a string to the simulated display, schedule an interrupt 
+//	to occur in the future, and return.
+//----------------------------------------------------------------------
 void
 ConsoleOutput::PrintString(char *str, int length)
 {
