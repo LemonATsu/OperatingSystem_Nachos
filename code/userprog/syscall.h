@@ -36,7 +36,7 @@
 #define SC_ThreadJoin   15
 #define SC_Add		42
 #define SC_MSG		100
-
+#define SC_PrintInt 101
 #ifndef IN_ASM
 
 /* The system call interface.  These are the operations the Nachos

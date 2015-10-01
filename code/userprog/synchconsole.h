@@ -8,6 +8,11 @@
 // All rights reserved.  See copyright.h for copyright notice and limitation 
 // of liability and disclaimer of warranty provisions.
 
+
+// Record --------------------------------------------------------
+// 2015/10/1 : Implement PrintString() to do console string output.
+// end Record ----------------------------------------------------
+
 #ifndef SYNCHCONSOLE_H
 #define SYNCHCONSOLE_H
 
@@ -41,7 +46,9 @@ class SynchConsoleOutput : public CallBackObj {
     ~SynchConsoleOutput();
 
     void PutChar(char ch);	// Write a character, waiting if necessary
-   
+
+    void PrintString(char *str, int length); // Write a string to console (Implemented part)
+
   private:
     ConsoleOutput *consoleOutput;// the hardware display
     Lock *lock;			// only one writer at a time

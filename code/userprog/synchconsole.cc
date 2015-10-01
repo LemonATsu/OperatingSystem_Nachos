@@ -16,6 +16,9 @@
 //      "inputFile" -- if NULL, use stdin as console device
 //              otherwise, read from this file
 //----------------------------------------------------------------------
+// Record --------------------------------------------------------
+// 2015/10/1 : Implement PrintString() to do console string output.
+// end Record ----------------------------------------------------
 
 SynchConsoleInput::SynchConsoleInput(char *inputFile)
 {
@@ -102,6 +105,22 @@ SynchConsoleOutput::PutChar(char ch)
 {
     lock->Acquire();
     consoleOutput->PutChar(ch);
+    waitFor->P();
+    lock->Release();
+}
+
+//----------------------------------------------------------------------
+// (Implemented part)
+// SynchConsoleOutput::PrintString      (Implement date: 2015/10/1)
+//      Write a string to the console display, waiting if necessary.
+//----------------------------------------------------------------------
+
+
+void
+SynchConsoleOutput::PrintString(char *str, int length)
+{
+    lock->Acquire();
+    consoleOutput->PrintString(str, length);
     waitFor->P();
     lock->Release();
 }

@@ -48,6 +48,10 @@
 //	is in machine.h.
 //----------------------------------------------------------------------
 
+// Record --------------------------------------------------------
+// 2015/10/1 : add SC_PrintInt case() to do console int output.
+// end Record ----------------------------------------------------
+
 void
 ExceptionHandler(ExceptionType which)
 {
@@ -60,10 +64,23 @@ ExceptionHandler(ExceptionType which)
       	switch(type) {
       	case SC_Halt:
 			DEBUG(dbgSys, "Shutdown, initiated by user program.\n");
-			SysHalt();
-                        cout<<"in exception\n";
+            SysHalt();
+
+            // the code below will not be executed in normal condition.
+            // Because SysHalt will delete kernel after finish executing.
+                cout<<"in exception\n";
 			ASSERTNOTREACHED();
 			break;
+        case SC_PrintInt:
+            // read arg from reg[4]
+            SysPrintInt((int)kernel->machine->ReadRegister(4));
+            // fetch next instruction
+			kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+			kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg)+4);
+            return;
+            ASSERTNOTREACHED();
+            break;
 		case SC_MSG:
 			DEBUG(dbgSys, "Message received.\n");
 			val = kernel->machine->ReadRegister(4);
