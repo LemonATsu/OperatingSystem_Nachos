@@ -10,6 +10,10 @@
  * of liability and disclaimer of warranty provisions.
  */
 
+// Record --------------------------------------------------------
+// 2015/10/1 : define PrintInt() to do console int output.
+// end Record ----------------------------------------------------
+
 #ifndef SYSCALLS_H
 #define SYSCALLS_H
 
@@ -51,7 +55,10 @@
 
 /* Stop Nachos, and print out performance stats */
 void Halt();			
- 
+
+/* Print an integer number to console */
+void PrintInt(int number);
+
 /*
  * Add the two operants and return the result
  */ 

@@ -1,0 +1,11 @@
+2015/10/1:
+
+- modified :
+	code/machine/consle.h        : define PrintString(char *str, int length)
+	code/machine/console.cc      : implement PrintString(char *str, int length)
+	code/test/start.S	         : add SC_PrintInt routine
+	code/userprog/exception.cc   : add SC_PrintInt routine
+	code/userprog/syscall.h      : define PrintInt(int number) and SC_PrintInt
+	code/userprog/ksyscall.h     : define and implement SysPrintInt(int number)
+	code/userprog/synchconsole.h : define PrintString(char *str, int length)
+	code/userprog/synchconsole.cc: implement PrintString(char *str, int length)
