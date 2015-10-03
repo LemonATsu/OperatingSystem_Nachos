@@ -9,6 +9,7 @@
 // 2015/10/4 : define OpenFile(char *filename) 
 // 2015/10/4 : define WriteToFileId(char *buffer, int size, OpenFileId id) 
 // 2015/10/4 : define CloseFileId(OpenFileId id)
+// 2015/10/4 : define ReadFromFileId(char *buffer, int size, OpenFileId id) 
 // end Record ----------------------------------------------------
 
 #ifndef KERNEL_H
@@ -53,6 +54,7 @@ class Kernel {
 	int CreateFile(char* filename); // fileSystem call
     OpenFileId OpenFile(char *filename);
     int WriteToFileId(char *buffer, int size, OpenFileId id);
+    int ReadFromFileId(char *buffer, int size, OpenFileId id);
     int CloseFileId(OpenFileId id);
 // These are public for notational convenience; really, 
 // they're global variables used everywhere.

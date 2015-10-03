@@ -53,6 +53,7 @@
 // 2015/10/4 : add SC_Open case to do file open task
 // 2015/10/4 : add SC_Write case to do file write task
 // 2015/10/4 : add SC_Close case to close the file 
+// 2015/10/4 : add SC_Read case to do read file task
 // end Record ----------------------------------------------------
 
 void
@@ -130,6 +131,22 @@ ExceptionHandler(ExceptionType which)
                 OpenFileId f_id = (int) kernel->machine->ReadRegister(6);
                 
                 status = SysWrite(buffer, size, f_id);
+                kernel->machine->WriteRegister(2, (int) status);
+            }
+			kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+			kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg)+4);
+            return;
+            ASSERTNOTREACHED();
+            break;
+        case SC_Read:
+            val = kernel->machine->ReadRegister(4);
+            {
+                char *buffer = &(kernel->machine->mainMemory[val]);
+                int   size = (int) kernel->machine->ReadRegister(5);
+                OpenFileId f_id = (int) kernel->machine->ReadRegister(6);
+                
+                status = SysRead(buffer, size, f_id);
                 kernel->machine->WriteRegister(2, (int) status);
             }
 			kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));

@@ -34,6 +34,7 @@
 // 2015/10/4 : implement OpenFileForId(char *filename) 
 // 2015/10/4 : implement WriteToFilerId(char *buffer, int size, OpenFileId) 
 // 2015/10/4 : implement CloseFileId(OpenFileId id) 
+// 2015/10/4 : implement ReadFromFilerId(char *buffer, int size, OpenFileId) 
 // end Record ----------------------------------------------------
 
 #ifndef FS_H
@@ -73,7 +74,23 @@ class FileSystem {
 
     int WriteToFileId(char *buffer, int size, OpenFileId id) {
         OpenFile *file = fileDescriptorTable[id];
+        
+        if(file == NULL) {
+            return -1;
+        }
+        
         return file->Write(buffer, size);
+    }
+
+    int ReadFromFileId(char *buffer, int size, OpenFileId id) {
+        OpenFile *file = fileDescriptorTable[id];
+
+        if(file == NULL) {
+            return -1;
+        }
+
+        return file->Read(buffer, size);
+
     }
 
     int CloseFileId(OpenFileId id) {

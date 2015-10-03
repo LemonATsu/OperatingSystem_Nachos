@@ -13,6 +13,7 @@
 // 2015/10/4 : Implement SysOpen() 
 // 2015/10/4 : Implement SysWrite() 
 // 2015/10/4 : Implement SysClose() 
+// 2015/10/4 : Implement SysRead() 
 // end Record ----------------------------------------------------
 
 #ifndef __USERPROG_KSYSCALL_H__ 
@@ -50,6 +51,11 @@ OpenFileId SysOpen(char *filename)
 int SysWrite(char *buffer, int size, OpenFileId id) 
 {
     return kernel->interrupt->WriteToFileId(buffer, size, id);
+}
+
+int SysRead(char *buffer, int size, OpenFileId id)
+{
+    return kernel->interrupt->ReadFromFileId(buffer, size, id);
 }
 
 int SysClose(OpenFileId id)

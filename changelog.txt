@@ -15,16 +15,32 @@
 
 - modified :
 	code/filesys/filesys.h       : implement OpenFileForId(char *filename)
+	code/filesys/filesys.h       : implement WriteToFileId(buffer, size, id)
+	code/filesys/filesys.h       : implement ReadFromFileId(buffer, size, id)
+	code/filesys/filesys.h       : implement CloseFileId(OpenFileId id)
 	code/filesys/openfile.h      : typedef int OpenFileId
 	code/threads/kernel.h        : define OpenFile(char *filename)
+	code/threads/kernel.h        : define WriteToFileId(buffer, size, id)
+	code/threads/kernel.h        : define ReadFromFileId(buffer, size, id)
+	code/threads/kernel.h        : define CloseFileId(OpenFileId id)
 	code/threads/kernel.cc       : implement OpenFile(char *filename)
+	code/threads/kernel.cc       : implement WriteToFileId(buffer, size, id)
+	code/threads/kernel.cc       : implement ReadFromFileId(buffer, size, id)
+	code/threads/kernel.cc       : implement CloseFileId(OpenFileId id)
 	code/machine/interrupt.h     : typedef int OpenFileId
 	code/machine/interrupt.h     : define OpenFile(char *filename)
-	code/machine/interrupt.cc    : Implement OpenFile(char *filename)
-	code/userprog/exception.cc   : add SC_Open, SC_Write routine
+	code/machine/interrupt.cc    : implement OpenFile(char *filename)
+	code/machine/interrupt.cc    : implement WriteToFileId(buffer, size, id)
+	code/machine/interrupt.cc    : implement ReadFromFileId(buffer, size, id)
+	code/machine/interrupt.cc    : implement CloseFileId(OpenFileId id)
+	code/userprog/exception.cc   : add SC_Open, SC_Write, SC_Read, SC_Close routine
 	code/userprog/syscall.h      : define SysOpen(char *filename)
-	code/userprog/syscall.h      : define SysWrite(char *filename)
-	code/userprog/ksyscall.h     : define and implement SysOpen(char *filename)
-	code/userprog/ksyscall.h     : define and implement SysWrite(char *filename)
+	code/userprog/syscall.h      : define SysWrite(buffer, size, id)
+	code/userprog/syscall.h      : define SysRead(buffer, size, id)
+	code/userprog/syscall.h      : define SysClose(OpenFileId id)
+	code/userprog/ksyscall.h     : define/implement SysOpen(char *filename)
+	code/userprog/ksyscall.h     : define/implement SysWrite(buffer, size,id)
+	code/userprog/ksyscall.h     : define/implement SysRead(buffer, size, id)
+	code/userprog/ksyscall.h     : define/implement SysClose(OpenFileId id)
 	
 

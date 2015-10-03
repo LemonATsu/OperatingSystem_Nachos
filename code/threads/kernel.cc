@@ -8,6 +8,8 @@
 // Record --------------------------------------------------------
 // 2015/10/4 : Implement OpenFile(char *filename) 
 // 2015/10/4 : Implement WriteToFileId(char *buffer, int size, OpenFileId id) 
+// 2015/10/4 : Implement CloseFileId(OpenFileId id) 
+// 2015/10/4 : Implement ReadFromFileId(char *buffer, int size, OpenFileId id) 
 // end Record ----------------------------------------------------
 
 #include "copyright.h"
@@ -321,6 +323,11 @@ OpenFileId Kernel::OpenFile(char *filename)
 int Kernel::WriteToFileId(char *buffer, int size, OpenFileId id)
 {
     return fileSystem->WriteToFileId(buffer, size, id);
+}
+
+int Kernel::ReadFromFileId(char *buffer, int size, OpenFileId id)
+{
+    return fileSystem->ReadFromFileId(buffer, size, id);
 }
 
 int Kernel::CloseFileId(OpenFileId id)
