@@ -22,6 +22,8 @@
 
 // Record --------------------------------------------------------
 // 2015/10/4 : Implement OpenFile(char *filename) 
+// 2015/10/4 : Implement WriteToFileId(char *buffer, int size, OpenFileId) 
+// 2015/10/4 : Implement CloseFileId(OpenFileId id) 
 // end Record ----------------------------------------------------
 
 #include "copyright.h"
@@ -255,6 +257,17 @@ Interrupt::OpenFile(char *filename)
     return kernel->OpenFile(filename);
 }
 
+int
+Interrupt::WriteToFileId(char *buffer, int size, OpenFileId id)
+{
+    return kernel->WriteToFileId(buffer, size, id);
+}
+
+int
+Interrupt::CloseFileId(OpenFileId id)
+{
+    return kernel->CloseFileId(id);
+}
 
 //----------------------------------------------------------------------
 // Interrupt::Schedule

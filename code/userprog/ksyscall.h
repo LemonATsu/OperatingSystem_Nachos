@@ -12,6 +12,7 @@
 // 2015/10/1 : Implement SysPrintInt() to do console int output.
 // 2015/10/4 : Implement SysOpen() 
 // 2015/10/4 : Implement SysWrite() 
+// 2015/10/4 : Implement SysClose() 
 // end Record ----------------------------------------------------
 
 #ifndef __USERPROG_KSYSCALL_H__ 
@@ -49,6 +50,11 @@ OpenFileId SysOpen(char *filename)
 int SysWrite(char *buffer, int size, OpenFileId id) 
 {
     return kernel->interrupt->WriteToFileId(buffer, size, id);
+}
+
+int SysClose(OpenFileId id)
+{
+    return kernel->interrupt->CloseFileId(id);
 }
 
 void SysPrintInt(int number)

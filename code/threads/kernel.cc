@@ -5,6 +5,11 @@
 // All rights reserved.  See copyright.h for copyright notice and limitation 
 // of liability and disclaimer of warranty provisions.
 
+// Record --------------------------------------------------------
+// 2015/10/4 : Implement OpenFile(char *filename) 
+// 2015/10/4 : Implement WriteToFileId(char *buffer, int size, OpenFileId id) 
+// end Record ----------------------------------------------------
+
 #include "copyright.h"
 #include "debug.h"
 #include "main.h"
@@ -311,4 +316,14 @@ int Kernel::CreateFile(char *filename)
 OpenFileId Kernel::OpenFile(char *filename)
 {
     return fileSystem->OpenFileForId(filename);
+}
+
+int Kernel::WriteToFileId(char *buffer, int size, OpenFileId id)
+{
+    return fileSystem->WriteToFileId(buffer, size, id);
+}
+
+int Kernel::CloseFileId(OpenFileId id)
+{
+    return fileSystem->CloseFileId(id);
 }

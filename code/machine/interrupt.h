@@ -33,6 +33,8 @@
 // Record --------------------------------------------------------
 // 2015/10/4 : typedef OpenFileId
 // 2015/10/4 : define OpenFile(char *filename) 
+// 2015/10/4 : define WriteToFileId(char *buffer, int size, OpenFileId id) 
+// 2015/10/4 : define CloseFileId(OpenFileId id)
 // end Record ----------------------------------------------------
 
 #ifndef INTERRUPT_H
@@ -104,6 +106,9 @@ class Interrupt {
     void PrintInt(int number);
 	int CreateFile(char *filename);
     OpenFileId OpenFile(char *filename);
+    int WriteToFileId(char *buffer, int size, OpenFileId id);
+    int CloseFileId(OpenFileId id);
+
     void YieldOnReturn();	// cause a context switch on return 
 				// from an interrupt handler
 
