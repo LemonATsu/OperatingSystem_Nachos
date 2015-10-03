@@ -308,4 +308,7 @@ int Kernel::CreateFile(char *filename)
 	return fileSystem->Create(filename);
 }
 
-
+OpenFileId Kernel::OpenFile(char *filename)
+{
+    return fileSystem->OpenFileForId(filename);
+}

@@ -30,6 +30,10 @@
 // All rights reserved.  See copyright.h for copyright notice and limitation 
 // of liability and disclaimer of warranty provisions.
 
+// Record --------------------------------------------------------
+// 2015/10/4 : implement OpenFileForId(char *filename) 
+// end Record ----------------------------------------------------
+
 #ifndef FS_H
 #define FS_H
 
@@ -58,6 +62,12 @@ class FileSystem {
 	  if (fileDescriptor == -1) return NULL;
 	  return new OpenFile(fileDescriptor);
       }
+
+    OpenFileId OpenFileForId(char *filename) {
+        int fd = OpenForReadWrite(filename, FALSE);
+        fileDescriptorTable[fd] = new OpenFile(fd);
+        return fd;
+    }
 
     bool Remove(char *name) { return Unlink(name) == 0; }
 

@@ -9,3 +9,22 @@
 	code/userprog/ksyscall.h     : define and implement SysPrintInt(int number)
 	code/userprog/synchconsole.h : define PrintString(char *str, int length)
 	code/userprog/synchconsole.cc: implement PrintString(char *str, int length)
+
+
+2015/10/4:
+
+- modified :
+	code/filesys/filesys.h       : implement OpenFileForId(char *filename)
+	code/filesys/openfile.h      : typedef int OpenFileId
+	code/threads/kernel.h        : define OpenFile(char *filename)
+	code/threads/kernel.cc       : implement OpenFile(char *filename)
+	code/machine/interrupt.h     : typedef int OpenFileId
+	code/machine/interrupt.h     : define OpenFile(char *filename)
+	code/machine/interrupt.cc    : Implement OpenFile(char *filename)
+	code/userprog/exception.cc   : add SC_Open, SC_Write routine
+	code/userprog/syscall.h      : define SysOpen(char *filename)
+	code/userprog/syscall.h      : define SysWrite(char *filename)
+	code/userprog/ksyscall.h     : define and implement SysOpen(char *filename)
+	code/userprog/ksyscall.h     : define and implement SysWrite(char *filename)
+	
+

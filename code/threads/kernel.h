@@ -5,6 +5,10 @@
 // All rights reserved.  See copyright.h for copyright notice and limitation 
 // of liability and disclaimer of warranty provisions.
 
+// Record --------------------------------------------------------
+// 2015/10/4 : define OpenFile(char *filename) 
+// end Record ----------------------------------------------------
+
 #ifndef KERNEL_H
 #define KERNEL_H
 
@@ -45,7 +49,7 @@ class Kernel {
 	Thread* getThread(int threadID){return t[threadID];}    
 	
 	int CreateFile(char* filename); // fileSystem call
-
+    OpenFileId OpenFile(char *filename);
 // These are public for notational convenience; really, 
 // they're global variables used everywhere.
 

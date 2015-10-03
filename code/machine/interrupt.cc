@@ -20,6 +20,10 @@
 // All rights reserved.  See copyright.h for copyright notice and limitation 
 // of liability and disclaimer of warranty provisions.
 
+// Record --------------------------------------------------------
+// 2015/10/4 : Implement OpenFile(char *filename) 
+// end Record ----------------------------------------------------
+
 #include "copyright.h"
 #include "interrupt.h"
 #include "main.h"
@@ -243,6 +247,12 @@ int
 Interrupt::CreateFile(char *filename)
 {
     return kernel->CreateFile(filename);
+}
+
+OpenFileId
+Interrupt::OpenFile(char *filename)
+{
+    return kernel->OpenFile(filename);
 }
 
 

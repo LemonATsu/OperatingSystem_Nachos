@@ -8,6 +8,12 @@
  *
  **************************************************************/
 
+// Record --------------------------------------------------------
+// 2015/10/1 : Implement SysPrintInt() to do console int output.
+// 2015/10/4 : Implement SysOpen() 
+// 2015/10/4 : Implement SysWrite() 
+// end Record ----------------------------------------------------
+
 #ifndef __USERPROG_KSYSCALL_H__ 
 #define __USERPROG_KSYSCALL_H__ 
 
@@ -15,9 +21,6 @@
 
 #include "synchconsole.h"
 
-// Record --------------------------------------------------------
-// 2015/10/1 : Implement SysPrintInt() to do console int output.
-// end Record ----------------------------------------------------
 
 
 void SysHalt()
@@ -36,6 +39,16 @@ int SysCreate(char *filename)
 	// 1: success
 	// 0: failed
 	return kernel->interrupt->CreateFile(filename);
+}
+
+OpenFileId SysOpen(char *filename)
+{
+    return kernel->interrupt->OpenFile(filename);
+}
+
+int SysWrite(char *buffer, int size, OpenFileId id) 
+{
+    return kernel->interrupt->WriteToFileId(buffer, size, id);
 }
 
 void SysPrintInt(int number)

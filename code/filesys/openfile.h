@@ -17,6 +17,10 @@
 // All rights reserved.  See copyright.h for copyright notice and limitation 
 // of liability and disclaimer of warranty provisions.
 
+// Record --------------------------------------------------------
+// 2015/10/4 : typedef int OpenFileId
+// end Record ----------------------------------------------------
+
 #ifndef OPENFILE_H
 #define OPENFILE_H
 
@@ -27,6 +31,8 @@
 #ifdef FILESYS_STUB			// Temporarily implement calls to 
 					// Nachos file system as calls to UNIX!
 					// See definitions listed under #else
+typedef int OpenFileId;
+
 class OpenFile {
   public:
     OpenFile(int f) { file = f; currentOffset = 0; }	// open the file

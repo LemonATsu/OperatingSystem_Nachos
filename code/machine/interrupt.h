@@ -30,6 +30,11 @@
 // All rights reserved.  See copyright.h for copyright notice and limitation 
 // of liability and disclaimer of warranty provisions.
 
+// Record --------------------------------------------------------
+// 2015/10/4 : typedef OpenFileId
+// 2015/10/4 : define OpenFile(char *filename) 
+// end Record ----------------------------------------------------
+
 #ifndef INTERRUPT_H
 #define INTERRUPT_H
 
@@ -37,6 +42,8 @@
 #include "list.h"
 #include "callback.h"
 
+// Define openfile Id
+typedef int OpenFileId;
 // Interrupts can be disabled (IntOff) or enabled (IntOn)
 enum IntStatus { IntOff, IntOn };
 
@@ -96,7 +103,7 @@ class Interrupt {
 
     void PrintInt(int number);
 	int CreateFile(char *filename);
- 
+    OpenFileId OpenFile(char *filename);
     void YieldOnReturn();	// cause a context switch on return 
 				// from an interrupt handler
 

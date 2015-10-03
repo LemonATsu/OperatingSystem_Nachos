@@ -50,6 +50,8 @@
 
 // Record --------------------------------------------------------
 // 2015/10/1 : add SC_PrintInt case() to do console int output.
+// 2015/10/4 : add SC_Open case to do file open task
+// 2015/10/4 : add SC_Write case to do file write task
 // end Record ----------------------------------------------------
 
 void
@@ -105,7 +107,37 @@ ExceptionHandler(ExceptionType which)
 			return;
 			ASSERTNOTREACHED();
             break;
-      	case SC_Add:
+      	case SC_Open:
+            val = kernel->machine->ReadRegister(4);
+            {
+                // address translation
+                char *filename = &(kernel->machine->mainMemory[val]);
+                OpenFileId f_id = SysOpen(filename);
+                kernel->machine->WriteRegister(2, (OpenFileId) f_id);
+            }
+			kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+			kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg)+4);
+            return;
+            ASSERTNOTREACHED();
+            break;
+        case SC_Write:
+            val = kernel->machine->ReadRegister(4);
+            {
+                char *buffer = &(kernel->machine->mainMemory[val]);
+                int   size = (int) kernel->machine->ReadRegister(5);
+                OpenFileId f_id = (int) kernel->machine->ReadRegister(6);
+                
+                status = SysWrite(buffer, size, f_id);
+                kernel->machine->WriteRegister(2, status);
+            }
+			kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+			kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg)+4);
+            return;
+            ASSERTNOTREACHED();
+            break;
+        case SC_Add:
 			DEBUG(dbgSys, "Add " << kernel->machine->ReadRegister(4) << " + " << kernel->machine->ReadRegister(5) << "\n");
 			/* Process SysAdd Systemcall*/
 			int result;
