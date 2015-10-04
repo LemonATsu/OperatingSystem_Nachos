@@ -25,6 +25,7 @@
 // 2015/10/4 : Implement WriteToFileId(char *buffer, int size, OpenFileId) 
 // 2015/10/4 : Implement CloseFileId(OpenFileId id) 
 // 2015/10/4 : Implement ReadFromFileId(char *buffer, int size, OpenFileId) 
+// 2015/10/5 : Add comment to OpenFile, WriteToFileId, CloseFileId, ReadFromFileId
 // end Record ----------------------------------------------------
 
 #include "copyright.h"
@@ -246,30 +247,81 @@ Interrupt::Halt()
     delete kernel;	// Never returns.
 }
 
+//----------------------------------------------------------------------
+// Interrupt::CreateFile
+//  Create a file.
+//
+// Returns: 
+//  CreateFile status.
+// Parameters:
+//  "filename" -- create a file named "filename".
+//----------------------------------------------------------------------
 int
 Interrupt::CreateFile(char *filename)
 {
     return kernel->CreateFile(filename);
 }
 
+//----------------------------------------------------------------------
+// Interrupt::OpenFile
+//  Open a file.
+//
+// Returns:
+//  file id(file descriptor) of target file.
+// Parameters:
+//  (filename) -- filename of the file you want to open.
+//----------------------------------------------------------------------
 OpenFileId
 Interrupt::OpenFile(char *filename)
 {
     return kernel->OpenFile(filename);
 }
 
+//----------------------------------------------------------------------
+// Interrupt::WriteToFileId
+//  Write string to target file specify by file id.
+//
+// Returns:
+//  Number of chars written to the file.
+// Parameters:
+//  (buffer) -- char pointer points to the string you want to write.
+//  (size)   -- Size of the char you want to write.
+//  (id)     -- file id of target file.
+//
+//----------------------------------------------------------------------
 int
 Interrupt::WriteToFileId(char *buffer, int size, OpenFileId id)
 {
     return kernel->WriteToFileId(buffer, size, id);
 }
 
+//----------------------------------------------------------------------
+// Interrupt::WriteToFileId
+//  Read char from target file.
+//
+// Returns:
+//  Number of chars read from the file.
+// Parameters:
+//  (buffer) -- char pointer points to the string you want to read to.
+//  (size)   -- Size of the char you want to read.
+//  (id)     -- file id of target file.
+//----------------------------------------------------------------------
 int
 Interrupt::ReadFromFileId(char *buffer, int size, OpenFileId id)
 {
     return kernel->ReadFromFileId(buffer, size, id);
 }
 
+
+//----------------------------------------------------------------------
+// Interrupt::CloseFileId
+//  Close file specify by file id.
+//
+// Returns:
+//  Close file status.
+// Parameters:
+//  (id)  -- file id of the file you want to close.
+//----------------------------------------------------------------------
 int
 Interrupt::CloseFileId(OpenFileId id)
 {
