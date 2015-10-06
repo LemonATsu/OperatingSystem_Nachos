@@ -42,5 +42,10 @@
 	code/userprog/ksyscall.h     : define/implement SysWrite(buffer, size,id)
 	code/userprog/ksyscall.h     : define/implement SysRead(buffer, size, id)
 	code/userprog/ksyscall.h     : define/implement SysClose(OpenFileId id)
-	
+
+2015/10/6:
+
+- modified :
+	code/filesys/filesys.h       : Add if statement to prevent crash
+    code/filesys/filesys.h       : Null the table index after closing file
 
