@@ -36,6 +36,7 @@
 // 2015/10/4 : implement CloseFileId(OpenFileId id) 
 // 2015/10/4 : implement ReadFromFilerId(char *buffer, int size, OpenFileId) 
 // 2015/10/6 : add if statement to prevent OpenFileForId crash
+// 2015/10/6 : Null the table index after closing file
 // end Record ----------------------------------------------------
 
 #ifndef FS_H
@@ -101,11 +102,11 @@ class FileSystem {
 
     int CloseFileId(OpenFileId id) {
         OpenFile *file = fileDescriptorTable[id];
-
         if(file == NULL) {
             return 0;
         }
         delete file;
+        fileDescriptorTable[id] = NULL;
         
         return 1;
     }
