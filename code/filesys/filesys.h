@@ -35,6 +35,7 @@
 // 2015/10/4 : implement WriteToFilerId(char *buffer, int size, OpenFileId) 
 // 2015/10/4 : implement CloseFileId(OpenFileId id) 
 // 2015/10/4 : implement ReadFromFilerId(char *buffer, int size, OpenFileId) 
+// 2015/10/6 : add if statement to prevent OpenFileForId crash
 // end Record ----------------------------------------------------
 
 #ifndef FS_H
@@ -68,6 +69,11 @@ class FileSystem {
 
     OpenFileId OpenFileForId(char *filename) {
         int fd = OpenForReadWrite(filename, FALSE);
+
+        if(fd == -1) { 
+            return fd;
+        }
+
         fileDescriptorTable[fd] = new OpenFile(fd);
         return fd;
     }
