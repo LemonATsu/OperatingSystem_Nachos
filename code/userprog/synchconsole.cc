@@ -115,7 +115,6 @@ SynchConsoleOutput::PutChar(char ch)
 //      Write a string to the console display, waiting if necessary.
 //----------------------------------------------------------------------
 
-
 void
 SynchConsoleOutput::PrintString(char *str, int length)
 {
@@ -123,6 +122,42 @@ SynchConsoleOutput::PrintString(char *str, int length)
     consoleOutput->PrintString(str, length);
     waitFor->P();
     lock->Release();
+}
+
+void
+SynchConsoleOutput::PrintInt(int number)
+{
+    int sign = number >= 0 ? 0 : 1; // sign = 1 : negative
+    int len = 0, copy_len = 0;
+    char *str = new char[sizeof(int) * 8 + 2]; // parse Int to in a reverse string,
+    char *rev = new char[sizeof(int) * 8 + 2]; // reverse the string back to normal int format.
+    
+    if(number == 0) {
+        PrintString("0\n\0", 3); // 0, print it directly
+        return; 
+    }
+    number = number < 0 ? -number : number;
+    
+    while(number > 0) {
+        str[len++] = (number % 10) + '0';
+        number /=10;
+    }
+
+    // check if it is negative
+    if(sign)
+        rev[copy_len++] = '-';
+
+    // reverse it back to normal string
+    for(len = len - 1; len >= 0; len--) {
+        rev[copy_len++] = str[len];
+    }
+
+    // add newline and terminate character
+    rev[copy_len++] = '\n';
+    rev[copy_len++] = '\0';
+
+    // console part
+    PrintString(rev, copy_len);
 }
 
 //----------------------------------------------------------------------

@@ -11,6 +11,7 @@
 
 // Record --------------------------------------------------------
 // 2015/10/1 : Implement PrintString() to do console string output.
+// 2015/10/8 : modify PrintInt flow.
 // end Record ----------------------------------------------------
 
 #ifndef SYNCHCONSOLE_H
@@ -46,7 +47,7 @@ class SynchConsoleOutput : public CallBackObj {
     ~SynchConsoleOutput();
 
     void PutChar(char ch);	// Write a character, waiting if necessary
-
+    void PrintInt(int number);
     void PrintString(char *str, int length); // Write a string to console (Implemented part)
 
   private:
