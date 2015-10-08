@@ -189,3 +189,4 @@ ConsoleOutput::PrintString(char *str, int length)
     putBusy = TRUE;
     kernel->interrupt->Schedule(this, ConsoleTime, ConsoleWriteInt);
 }
+
