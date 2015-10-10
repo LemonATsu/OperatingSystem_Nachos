@@ -18,6 +18,7 @@
 //----------------------------------------------------------------------
 // Record --------------------------------------------------------
 // 2015/10/1 : Implement PrintString() to do console string output.
+// 2015/10/10: modify PrintInt, make it shorter
 // end Record ----------------------------------------------------
 
 SynchConsoleInput::SynchConsoleInput(char *inputFile)
@@ -132,30 +133,23 @@ SynchConsoleOutput::PrintInt(int number)
     char *str = new char[sizeof(int) * 8 + 2]; // parse Int to in a reverse string,
     char *rev = new char[sizeof(int) * 8 + 2]; // reverse the string back to normal int format.
     
-    if(number == 0) {
-        PrintString("0\n\0", 3); // 0, print it directly
-        return; 
-    }
     number = number < 0 ? -number : number;
     
-    while(number > 0) {
+    do {
         str[len++] = (number % 10) + '0';
         number /=10;
-    }
+    } while(number > 0);
 
     // check if it is negative
     if(sign)
         rev[copy_len++] = '-';
-
     // reverse it back to normal string
     for(len = len - 1; len >= 0; len--) {
         rev[copy_len++] = str[len];
     }
-
     // add newline and terminate character
     rev[copy_len++] = '\n';
     rev[copy_len++] = '\0';
-
     // console part
     PrintString(rev, copy_len);
 }
