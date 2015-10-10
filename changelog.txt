@@ -49,3 +49,8 @@
 	code/filesys/filesys.h       : Add if statement to prevent crash
     code/filesys/filesys.h       : Null the table index after closing file
 
+2015/10/10:
+
+- modified :
+	code/userprog/synchconsole.cc: modify PrintInt : use do/while instead of a
+	if case.
