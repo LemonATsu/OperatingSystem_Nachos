@@ -10,6 +10,7 @@
 // 2015/10/4 : Implement WriteToFileId(char *buffer, int size, OpenFileId id) 
 // 2015/10/4 : Implement CloseFileId(OpenFileId id) 
 // 2015/10/4 : Implement ReadFromFileId(char *buffer, int size, OpenFileId id) 
+// 2015/10/13: modify PrintInt flow again
 // end Record ----------------------------------------------------
 
 #include "copyright.h"
@@ -308,6 +309,11 @@ int Kernel::Exec(char* name)
 //	currentThread->Finish();
 //    Kernel::Run();
 //  cout << "after ThreadedKernel:Run();" << endl;  // unreachable
+}
+
+void Kernel::PrintInt(int number) 
+{
+    kernel->synchConsoleOut->PrintInt(number);
 }
 
 int Kernel::CreateFile(char *filename)

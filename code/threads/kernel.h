@@ -10,6 +10,7 @@
 // 2015/10/4 : define WriteToFileId(char *buffer, int size, OpenFileId id) 
 // 2015/10/4 : define CloseFileId(OpenFileId id)
 // 2015/10/4 : define ReadFromFileId(char *buffer, int size, OpenFileId id) 
+// 2015/10/13: modify PrintInt flow again
 // end Record ----------------------------------------------------
 
 #ifndef KERNEL_H
@@ -73,7 +74,7 @@ class Kernel {
     PostOfficeOutput *postOfficeOut;
 
     int hostName;               // machine identifier
-
+    void PrintInt(int number);
   private:
 
 	Thread* t[10];

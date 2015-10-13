@@ -27,12 +27,12 @@
 // 2015/10/4 : Implement ReadFromFileId(char *buffer, int size, OpenFileId) 
 // 2015/10/5 : Add comment to OpenFile, WriteToFileId, CloseFileId, ReadFromFileId
 // 2015/10/8 : modify PrintInt flow
+// 2015/10/13: modify PrintInt flow again
 // end Record ----------------------------------------------------
 
 #include "copyright.h"
 #include "interrupt.h"
 #include "main.h"
-#include "synchconsole.h"
 
 // String definitions for debugging messages
 
@@ -446,6 +446,6 @@ Interrupt::DumpState()
 void
 Interrupt::PrintInt(int number)
 {
-    kernel->synchConsoleOut->PrintInt(number);
+    kernel->PrintInt(number);
 }
 
