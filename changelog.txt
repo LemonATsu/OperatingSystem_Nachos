@@ -47,10 +47,16 @@
 
 - modified :
 	code/filesys/filesys.h       : Add if statement to prevent crash
-    code/filesys/filesys.h       : Null the table index after closing file
+	code/filesys/filesys.h       : Null the table index after closing file
 
 2015/10/10:
 
 - modified :
 	code/userprog/synchconsole.cc: modify PrintInt : use do/while instead of a
 	if case.
+
+2015/10/13:
+
+- modified :
+	code/machine/interrupt.cc : modify PrintInt flow
+	code/threads/kernel.cc    : modify PrintInt flow
