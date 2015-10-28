@@ -11,6 +11,8 @@
 // 2015/10/4 : Implement CloseFileId(OpenFileId id) 
 // 2015/10/4 : Implement ReadFromFileId(char *buffer, int size, OpenFileId id) 
 // 2015/10/13: modify PrintInt flow again
+// 2015/10/28: in Exec: now theard call AddrSpace(int threadNum) to initialize
+// 2015/10/28: in Exec: now change back to call AddrSpace to initialize for dynamically alloc
 // end Record ----------------------------------------------------
 
 #include "copyright.h"
@@ -280,6 +282,7 @@ int Kernel::Exec(char* name)
 {
 	t[threadNum] = new Thread(name, threadNum);
 	t[threadNum]->space = new AddrSpace();
+	//t[threadNum]->space = new AddrSpace(threadNum);
 	t[threadNum]->Fork((VoidFunctionPtr) &ForkExecute, (void *)t[threadNum]);
 	threadNum++;
 
