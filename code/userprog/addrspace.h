@@ -10,6 +10,11 @@
 // All rights reserved.  See copyright.h for copyright notice and limitation 
 // of liability and disclaimer of warranty provisions.
 
+// Record --------------------------------------------------------
+// 2015/10/28 : Add constructor AddrSpace(int threadNum)
+// 2015/10/28 : add private field basePhyPageNum
+// end Record ----------------------------------------------------
+
 #ifndef ADDRSPACE_H
 #define ADDRSPACE_H
 
@@ -17,10 +22,12 @@
 #include "filesys.h"
 
 #define UserStackSize		1024 	// increase this as necessary!
+#define PageNumPerProc      32
 
 class AddrSpace {
   public:
     AddrSpace();			// Create an address space.
+    AddrSpace(int threadNum);
     ~AddrSpace();			// De-allocate an address space
 
     bool Load(char *fileName);		// Load a program into addr space from
@@ -44,9 +51,10 @@ class AddrSpace {
 					// for now!
     unsigned int numPages;		// Number of pages in the virtual 
 					// address space
-
+    unsigned int basePhyPageNum;
     void InitRegisters();		// Initialize user-level CPU registers,
 					// before jumping to user code
+    static bool usedPhyPages[NumPhysPages];
 
 };
 
