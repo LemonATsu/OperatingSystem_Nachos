@@ -25,7 +25,7 @@
 #include "machine.h"
 #include "noff.h"
 
-bool AddrSpace::usedPhyPages[NumPhysPages] = {FALSE};
+bool AddrSpace::inUsedPhyPages[NumPhysPages] = {FALSE};
 //----------------------------------------------------------------------
 // SwapHeader
 // 	Do little endian to big endian conversion on the bytes in the 
@@ -114,7 +114,7 @@ AddrSpace::~AddrSpace()
 {
     // release used pages.
    for(int i = 0; i < numPages; i ++) {
-        AddrSpace::usedPhyPages[pageTable[i].physicalPage] = FALSE;
+        AddrSpace::inUsedPhyPages[pageTable[i].physicalPage] = FALSE;
    }
    delete pageTable;
 }
@@ -169,18 +169,17 @@ AddrSpace::Load(char *fileName)
 						// to run anything too big --
 						// at least until we have
 						// virtual memory
-
     pageTable = new TranslationEntry[numPages];
     for(unsigned int i = 0, j = 0; i < numPages; i ++) {
         pageTable[i].virtualPage = i;
         
         while(j < NumPhysPages 
-                && AddrSpace::usedPhyPages[j] == TRUE) {
+                && AddrSpace::inUsedPhyPages[j] == TRUE) {
             j ++;
             ASSERT(j < NumPhysPages); // do not reach out NumPhyPages
                                       // normally, this won't happen 
         }
-        AddrSpace::usedPhyPages[j] = TRUE;
+        AddrSpace::inUsedPhyPages[j] = TRUE;
         pageTable[i].physicalPage = j;
 	    pageTable[i].valid = TRUE;
 	    pageTable[i].use = FALSE;

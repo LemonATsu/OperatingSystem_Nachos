@@ -54,7 +54,7 @@ class AddrSpace {
     unsigned int basePhyPageNum;
     void InitRegisters();		// Initialize user-level CPU registers,
 					// before jumping to user code
-    static bool usedPhyPages[NumPhysPages];
+    static bool inUsedPhyPages[NumPhysPages];
 
 };
 
