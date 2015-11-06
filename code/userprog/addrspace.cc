@@ -170,7 +170,7 @@ AddrSpace::Load(char *fileName)
 						// at least until we have
 						// virtual memory
     pageTable = new TranslationEntry[numPages];
-    for(unsigned int i = 0, j = 0; i < numPages; i ++) {
+    for(int i = 0, j = 0; i < numPages; i ++) {
         pageTable[i].virtualPage = i;
         
         while(j < NumPhysPages 
