@@ -107,9 +107,28 @@ class Thread {
     void Print() { cout << name; }
     void SelfTest();		// test whether thread impl is working
 
+
+    int getBurstTime() { return (burstTime); }
+    void setBurstTime(int length) { burstTime = length; }
+
+    int getStartTime() { return (startTime); }
+    void setStartTime(int when) { startTime = when; }
+
+    int getPriority() { return priority; }
+    void setPriority(int p) { 
+        if(p < 150) priority = p; 
+    }
+    void aging() { 
+        if(priority < 150) priority += 1; 
+    }
+
+
   private:
     // some of the private data for this class is listed above
-    
+    int priority;
+    int startTime;
+    int burstTime;
+
     int *stack; 	 	// Bottom of the stack 
 				// NULL if this is the main thread
 				// (If NULL, don't deallocate stack)
