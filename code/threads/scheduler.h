@@ -6,6 +6,9 @@
 // All rights reserved.  See copyright.h for copyright notice and limitation 
 // of liability and disclaimer of warranty provisions.
 
+// 15/12/01: add 3 level queue 
+
+
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
@@ -33,10 +36,17 @@ class Scheduler {
     void Print();		// Print contents of ready list
     
     // SelfTest for scheduler is implemented in class Thread
-    
+   
+
+
   private:
     List<Thread *> *readyList;  // queue of threads that are ready to run,
 				// but not running
+
+    List<Thread *> *SJFList;
+    List<Thread *> *PJList;
+    List<Thread *> *RRList;
+
     Thread *toBeDestroyed;	// finishing thread to be destroyed
     				// by the next thread that runs
 };

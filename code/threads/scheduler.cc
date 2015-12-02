@@ -23,6 +23,28 @@
 #include "scheduler.h"
 #include "main.h"
 
+int SJFCompare(Thread *a, Thread *b) 
+{
+    int ta = a->getBurstTime(),
+        tb = b->getBurstTime();
+
+    if (ta == tb)
+        return 0;
+    return ta > tb ? 1 : -1;
+}
+
+int PJCompare(Thread *a, Thread *b)
+{
+    int pa = a->getPriority(),
+        pb = a->getPriority();
+
+    if(pa == pb)
+        return 0;
+    return pa > pb ? -1 : 1;
+}
+
+
+
 //----------------------------------------------------------------------
 // Scheduler::Scheduler
 // 	Initialize the list of ready but not running threads.
@@ -32,6 +54,9 @@
 Scheduler::Scheduler()
 { 
     readyList = new List<Thread *>; 
+    SJFList = new SortedList<Thread *>(SJFCompare);
+    PJList = new SortedList<Thread *>(PJCompare);
+    RRList = new List<Thread *>;
     toBeDestroyed = NULL;
 } 
 
@@ -57,10 +82,20 @@ void
 Scheduler::ReadyToRun (Thread *thread)
 {
     ASSERT(kernel->interrupt->getLevel() == IntOff);
-    DEBUG(dbgThread, "Putting thread on ready list: " << thread->getName());
+    //DEBUG(dbgThread, "Putting thread on ready list: " << thread->getName());
 	//cout << "Putting thread on ready list: " << thread->getName() << endl ;
     thread->setStatus(READY);
-    readyList->Append(thread);
+    //readyList->Append(thread);
+    int p = thread->getPriority();
+    if(p >= 100) {
+        // L1 queue
+        SJFList->Append(thread);
+    } else if (p >= 50) {
+        // L2 queue
+
+    } else {
+        // L3 queue
+    }
 }
 
 //----------------------------------------------------------------------
@@ -177,3 +212,5 @@ Scheduler::Print()
     cout << "Ready list contents:\n";
     readyList->Apply(ThreadPrint);
 }
+
+
