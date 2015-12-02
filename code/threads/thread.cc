@@ -16,6 +16,9 @@
 // All rights reserved.  See copyright.h for copyright notice and limitation 
 // of liability and disclaimer of warranty provisions.
 
+//  2015/12/02 : add another contructor that takes priority as arg.
+
+
 #include "copyright.h"
 #include "thread.h"
 #include "switch.h"
@@ -37,6 +40,30 @@ Thread::Thread(char* threadName, int threadID)
 {
 	ID = threadID;
     name = threadName;
+    priority = 0;   
+    stackTop = NULL;
+    stack = NULL;
+    status = JUST_CREATED;
+    for (int i = 0; i < MachineStateSize; i++) {
+	machineState[i] = NULL;		// not strictly necessary, since
+					// new thread ignores contents 
+					// of machine registers
+    }
+    space = NULL;
+}
+//----------------------------------------------------------------------
+// Thread::Thread
+// 	Initialize a thread with addtional prior arg!
+//	Thread::Fork.
+//
+//	"threadName" is an arbitrary string, useful for debugging.
+//----------------------------------------------------------------------
+
+Thread::Thread(char* threadName, int threadID, int prior)
+{
+	ID = threadID;
+    name = threadName;
+    priority = prior;
     stackTop = NULL;
     stack = NULL;
     status = JUST_CREATED;
@@ -97,6 +124,8 @@ Thread::Fork(VoidFunctionPtr func, void *arg)
     
     DEBUG(dbgThread, "Forking thread: " << name << " f(a): " << (int) func << " " << arg);
     StackAllocate(func, arg);
+
+    // set priority.
 
     oldLevel = interrupt->SetLevel(IntOff);
     scheduler->ReadyToRun(this);	// ReadyToRun assumes that interrupts 

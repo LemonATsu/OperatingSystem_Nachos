@@ -13,6 +13,7 @@
 // 2015/10/13: modify PrintInt flow again
 // 2015/10/28: in Exec: now theard call AddrSpace(int threadNum) to initialize
 // 2015/10/28: in Exec: now change back to call AddrSpace to initialize for dynamically alloc
+// 2015/12/02: add -ep argv, and modify Exec to take priority as arg
 // end Record ----------------------------------------------------
 
 #include "copyright.h"
@@ -57,8 +58,13 @@ Kernel::Kernel(int argc, char **argv)
             debugUserProg = TRUE;
 		} else if (strcmp(argv[i], "-e") == 0) {
         	execfile[++execfileNum]= argv[++i];
+            execpriority[execfileNum] = 0;
 			cout << execfile[execfileNum] << "\n";
-		} else if (strcmp(argv[i], "-ci") == 0) {
+		} else if (strcmp(argv[i], "-ep") == 0) {
+        	execfile[++execfileNum]= argv[++i];
+            execpriority[execfileNum] = atoi(argv[++i]);
+			cout << execfile[execfileNum] << " priority : " << execpriority[execfileNum] <<"\n";
+        } else if (strcmp(argv[i], "-ci") == 0) {
 	    	ASSERT(i + 1 < argc);
 	    	consoleIn = argv[i + 1];
 	    	i++;
@@ -271,17 +277,20 @@ void ForkExecute(Thread *t)
 void Kernel::ExecAll()
 {
 	for (int i=1;i<=execfileNum;i++) {
-		int a = Exec(execfile[i]);
+		int a = Exec(execfile[i], execpriority[i]);
 	}
 	currentThread->Finish();
     //Kernel::Exec();	
 }
 
 
-int Kernel::Exec(char* name)
+int Kernel::Exec(char* name, int priority)
 {
-	t[threadNum] = new Thread(name, threadNum);
+
+    // modified : now also pass priority
+	t[threadNum] = new Thread(name, threadNum, priority);
 	t[threadNum]->space = new AddrSpace();
+
 	//t[threadNum]->space = new AddrSpace(threadNum);
 	t[threadNum]->Fork((VoidFunctionPtr) &ForkExecute, (void *)t[threadNum]);
 	threadNum++;

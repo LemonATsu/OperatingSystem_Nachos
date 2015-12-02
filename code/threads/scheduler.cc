@@ -85,7 +85,7 @@ Scheduler::ReadyToRun (Thread *thread)
     //DEBUG(dbgThread, "Putting thread on ready list: " << thread->getName());
 	//cout << "Putting thread on ready list: " << thread->getName() << endl ;
     thread->setStatus(READY);
-    //readyList->Append(thread);
+    readyList->Append(thread);
     int p = thread->getPriority();
     if(p >= 100) {
         // L1 queue

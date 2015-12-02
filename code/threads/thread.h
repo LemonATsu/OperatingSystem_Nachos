@@ -49,6 +49,8 @@
 // the Snake needs 18,
 // and the RS6000 needs to save 75 (!)
 // For simplicity, I just take the maximum over all architectures.
+// 2015/12/01 : Modify Fork()
+// 2015/12/02 : Add another constructor, that takes priority as initialization arg
 
 #define MachineStateSize 75 
 
@@ -81,7 +83,9 @@ class Thread {
     void *machineState[MachineStateSize];  // all registers except for stackTop
 
   public:
+    //Thread(char* debugName, int threadID);		// initialize a Thread 
     Thread(char* debugName, int threadID);		// initialize a Thread 
+    Thread(char* debugName, int threadID, int prior);		// initialize a Thread 
     ~Thread(); 				// deallocate a Thread
 					// NOTE -- thread being deleted
 					// must not be running when delete 
@@ -90,6 +94,7 @@ class Thread {
     // basic thread operations
 
     void Fork(VoidFunctionPtr func, void *arg); 
+    //void Fork(VoidFunctionPtr func, void *arg, int priority); 
     				// Make thread run (*func)(arg)
     void Yield();  		// Relinquish the CPU if any 
 				// other thread is runnable
@@ -116,7 +121,7 @@ class Thread {
 
     int getPriority() { return priority; }
     void setPriority(int p) { 
-        if(p < 150) priority = p; 
+        if(p < 150 && p >= 0) priority = p; 
     }
     void aging() { 
         if(priority < 150) priority += 1; 
