@@ -37,15 +37,18 @@ class Scheduler {
     
     // SelfTest for scheduler is implemented in class Thread
    
-
+    void Aging(List<Thread *> *list);
+    void InsertLog(int time, int tid, int level);
+    void RemoveLog(int time, int tid, int level);
+    void SwitchLog(int time, int nid, int pid, int executed);
 
   private:
     List<Thread *> *readyList;  // queue of threads that are ready to run,
 				// but not running
 
-    List<Thread *> *SJFList;
-    List<Thread *> *PJList;
-    List<Thread *> *RRList;
+    SortedList<Thread *> *SJF_ReadyList;
+    SortedList<Thread *> *PJ_ReadyList;
+    List<Thread *> *RR_ReadyList;
 
     Thread *toBeDestroyed;	// finishing thread to be destroyed
     				// by the next thread that runs

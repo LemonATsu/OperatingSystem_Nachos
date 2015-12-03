@@ -63,7 +63,6 @@ Kernel::Kernel(int argc, char **argv)
 		} else if (strcmp(argv[i], "-ep") == 0) {
         	execfile[++execfileNum]= argv[++i];
             execpriority[execfileNum] = atoi(argv[++i]);
-			cout << execfile[execfileNum] << " priority : " << execpriority[execfileNum] <<"\n";
         } else if (strcmp(argv[i], "-ci") == 0) {
 	    	ASSERT(i + 1 < argc);
 	    	consoleIn = argv[i + 1];
@@ -94,6 +93,7 @@ Kernel::Kernel(int argc, char **argv)
             cout << "Partial usage: nachos [-n #] [-m #]\n";
 		}
     }
+    //ThreadSelfTest();
 }
 
 //----------------------------------------------------------------------
@@ -111,6 +111,7 @@ Kernel::Initialize()
     // object to save its state. 
 
 	
+    //currentThread = new Thread("main", threadNum++);		
     currentThread = new Thread("main", threadNum++);		
     currentThread->setStatus(RUNNING);
 
@@ -166,7 +167,6 @@ Kernel::ThreadSelfTest() {
    SynchList<int> *synchList;
    
    LibSelfTest();		// test library routines
-   
    currentThread->SelfTest();	// test thread switching
    
    				// test semaphore operation

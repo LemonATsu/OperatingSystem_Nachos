@@ -40,7 +40,7 @@ Thread::Thread(char* threadName, int threadID)
 {
 	ID = threadID;
     name = threadName;
-    priority = 0;   
+    priority = 151;   
     stackTop = NULL;
     stack = NULL;
     status = JUST_CREATED;
@@ -124,8 +124,6 @@ Thread::Fork(VoidFunctionPtr func, void *arg)
     
     DEBUG(dbgThread, "Forking thread: " << name << " f(a): " << (int) func << " " << arg);
     StackAllocate(func, arg);
-
-    // set priority.
 
     oldLevel = interrupt->SetLevel(IntOff);
     scheduler->ReadyToRun(this);	// ReadyToRun assumes that interrupts 
@@ -236,9 +234,11 @@ Thread::Yield ()
     
     DEBUG(dbgThread, "Yielding thread: " << name);
     
+    kernel->scheduler->ReadyToRun(this);
     nextThread = kernel->scheduler->FindNextToRun();
+    
     if (nextThread != NULL) {
-	kernel->scheduler->ReadyToRun(this);
+    //kernel->scheduler->ReadyToRun(this);
 	kernel->scheduler->Run(nextThread, FALSE);
     }
     (void) kernel->interrupt->SetLevel(oldLevel);
@@ -272,8 +272,8 @@ Thread::Sleep (bool finishing)
     ASSERT(this == kernel->currentThread);
     ASSERT(kernel->interrupt->getLevel() == IntOff);
     
-    DEBUG(dbgThread, "Sleeping thread: " << name);
-
+    //DEBUG(dbgThread, "Sleeping thread: " << name);
+    
     status = BLOCKED;
 	//cout << "debug Thread::Sleep " << name << "wait for Idle\n";
     while ((nextThread = kernel->scheduler->FindNextToRun()) == NULL) {
@@ -456,8 +456,7 @@ Thread::SelfTest()
 {
     DEBUG(dbgThread, "Entering Thread::SelfTest");
 
-    Thread *t = new Thread("forked thread", 1);
-
+    Thread *t = new Thread("forked thread", 1, 120);
     t->Fork((VoidFunctionPtr) SimpleThread, (void *) 1);
     kernel->currentThread->Yield();
     SimpleThread(0);

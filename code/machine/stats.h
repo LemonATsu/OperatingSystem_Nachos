@@ -18,6 +18,7 @@
 // many user instructions executed, etc.
 //
 // The fields in this class are public to make it easier to update.
+// 2015/12/02 : change timerticks from 100 to 500
 
 class Statistics {
   public:
@@ -55,6 +56,6 @@ const int RotationTime = 500; 	// time disk takes to rotate one sector
 const int SeekTime =	 500;  	// time disk takes to seek past one track
 const int ConsoleTime =	 100;	// time to read or write one character
 const int NetworkTime =	 100;  	// time to send or receive one packet
-const int TimerTicks = 	 100;  	// (average) time between timer interrupts
+const int TimerTicks = 	 500;  	// (average) time between timer interrupts
 
 #endif // STATS_H

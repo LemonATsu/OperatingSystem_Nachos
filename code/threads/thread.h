@@ -112,6 +112,8 @@ class Thread {
     void Print() { cout << name; }
     void SelfTest();		// test whether thread impl is working
 
+    int getReadyTime() { return (readyTime); }
+    void setReadyTime(int at) { readyTime = at; }
 
     int getBurstTime() { return (burstTime); }
     void setBurstTime(int length) { burstTime = length; }
@@ -121,18 +123,24 @@ class Thread {
 
     int getPriority() { return priority; }
     void setPriority(int p) { 
-        if(p < 150 && p >= 0) priority = p; 
+        if(p < 150 && p >= 0) {
+            priority = p; 
+        }
     }
-    void aging() { 
-        if(priority < 150) priority += 1; 
+    void Aging(int inc) {
+        if((priority + inc) >= 150) {
+            setPriority(149);
+        } else {
+            setPriority(priority + inc);
+        }
     }
-
 
   private:
     // some of the private data for this class is listed above
     int priority;
     int startTime;
     int burstTime;
+    int readyTime;
 
     int *stack; 	 	// Bottom of the stack 
 				// NULL if this is the main thread

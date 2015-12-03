@@ -22,6 +22,7 @@
 #include "debug.h"
 #include "scheduler.h"
 #include "main.h"
+#define AGING 10
 
 int SJFCompare(Thread *a, Thread *b) 
 {
@@ -54,9 +55,9 @@ int PJCompare(Thread *a, Thread *b)
 Scheduler::Scheduler()
 { 
     readyList = new List<Thread *>; 
-    SJFList = new SortedList<Thread *>(SJFCompare);
-    PJList = new SortedList<Thread *>(PJCompare);
-    RRList = new List<Thread *>;
+    SJF_ReadyList = new SortedList<Thread *>(SJFCompare);
+    PJ_ReadyList = new SortedList<Thread *>(PJCompare);
+    RR_ReadyList = new List<Thread *>;
     toBeDestroyed = NULL;
 } 
 
@@ -68,9 +69,13 @@ Scheduler::Scheduler()
 Scheduler::~Scheduler()
 { 
     delete readyList; 
+    delete SJF_ReadyList;
+    delete PJ_ReadyList;
+    delete RR_ReadyList;
 } 
 
 //----------------------------------------------------------------------
+// modified at 2015/12/02
 // Scheduler::ReadyToRun
 // 	Mark a thread as ready, but not running.
 //	Put it on the ready list, for later scheduling onto the CPU.
@@ -83,22 +88,30 @@ Scheduler::ReadyToRun (Thread *thread)
 {
     ASSERT(kernel->interrupt->getLevel() == IntOff);
     //DEBUG(dbgThread, "Putting thread on ready list: " << thread->getName());
-	//cout << "Putting thread on ready list: " << thread->getName() << endl ;
-    thread->setStatus(READY);
-    readyList->Append(thread);
+    int currentTime = kernel->stats->totalTicks;
     int p = thread->getPriority();
+    thread->setStatus(READY);
+    thread->setReadyTime(currentTime);
+
+    // Insert :: put item into list by order
+    // Append :: put item at tail of list
     if(p >= 100) {
         // L1 queue
-        SJFList->Append(thread);
+        SJF_ReadyList->Insert(thread);
+        InsertLog(currentTime, thread->getID(), 1);
     } else if (p >= 50) {
         // L2 queue
-
+        PJ_ReadyList->Insert(thread);
+        InsertLog(currentTime, thread->getID(), 2);
     } else {
         // L3 queue
+        RR_ReadyList->Append(thread);
+        InsertLog(currentTime, thread->getID(), 3);
     }
 }
 
 //----------------------------------------------------------------------
+// modified at 2015/12/02
 // Scheduler::FindNextToRun
 // 	Return the next thread to be scheduled onto the CPU.
 //	If there are no ready threads, return NULL.
@@ -110,12 +123,26 @@ Thread *
 Scheduler::FindNextToRun ()
 {
     ASSERT(kernel->interrupt->getLevel() == IntOff);
+    int currentTime = kernel->stats->totalTicks;
+    Thread* t = NULL;
+    if(!(SJF_ReadyList->IsEmpty())) {
 
-    if (readyList->IsEmpty()) {
-		return NULL;
-    } else {
-    	return readyList->RemoveFront();
+        t = SJF_ReadyList->RemoveFront();
+        RemoveLog(currentTime, t->getID(), 1);
+    
+    } else if(!(PJ_ReadyList->IsEmpty())) {
+    
+        t = PJ_ReadyList->RemoveFront();
+        RemoveLog(currentTime, t->getID(), 2);
+    
+    } else if(!RR_ReadyList->IsEmpty()) {
+        
+        t = RR_ReadyList->RemoveFront();
+        RemoveLog(currentTime, t->getID(), 3);
+
     }
+
+    return t;
 }
 
 //----------------------------------------------------------------------
@@ -159,7 +186,6 @@ Scheduler::Run (Thread *nextThread, bool finishing)
     nextThread->setStatus(RUNNING);      // nextThread is now running
     
     DEBUG(dbgThread, "Switching from: " << oldThread->getName() << " to: " << nextThread->getName());
-    
     // This is a machine-dependent assembly language routine defined 
     // in switch.s.  You may have to think
     // a bit to figure out what happens after this, both from the point
@@ -213,4 +239,35 @@ Scheduler::Print()
     readyList->Apply(ThreadPrint);
 }
 
+void
+Scheduler::Aging(List<Thread *> *list)
+{
+    ListIterator<Thread *> *iterator = new ListIterator<Thread *>(list);
+    for(; !(iterator->IsDone()); iterator->Next()) {
+        int currentTime = kernel->stats->totalTicks;
+        Thread* t = iterator->Item();
+        cout << "current Time : " << currentTime << endl; 
+        if((currentTime - t->getReadyTime()) >= 1500) {
+            t->Aging(AGING);
+            t->setReadyTime(currentTime); // reset time ticks.
+        }       
+    }
+}
+
+void
+Scheduler::InsertLog(int time, int tid, int level) 
+{
+    cout << "Tick " << time << ": Thread " << tid << " is inserted into queue L" << level << endl;
+}
+
+void
+Scheduler::RemoveLog(int time, int tid, int level)
+{
+    cout << "Tick " << time << ": Thread " << tid << " is removed from queue L" << level << endl;
+}
+
+void
+Scheduler::SwitchLog(int time, int nid, int pid, int executed) 
+{
+}
 
