@@ -34,15 +34,17 @@ class Scheduler {
     void CheckToBeDestroyed();// Check if thread that had been
     				// running needs to be deleted
     void Print();		// Print contents of ready list
-    
+    void CheckAndMove(Thread* t, int oldPriority);    
     // SelfTest for scheduler is implemented in class Thread
    
     void Aging(List<Thread *> *list);
     void InsertLog(int time, int tid, int level);
     void RemoveLog(int time, int tid, int level);
     void SwitchLog(int time, int nid, int pid, int executed);
-
+    void PriorityChangeLog(int time, int tid, int old, int now);
   private:
+    void InsertToQueue(Thread* t, int level);
+    void RemoveFromQueue(Thread* t, int level);
     List<Thread *> *readyList;  // queue of threads that are ready to run,
 				// but not running
 

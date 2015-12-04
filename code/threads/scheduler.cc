@@ -97,16 +97,13 @@ Scheduler::ReadyToRun (Thread *thread)
     // Append :: put item at tail of list
     if(p >= 100) {
         // L1 queue
-        SJF_ReadyList->Insert(thread);
-        InsertLog(currentTime, thread->getID(), 1);
+        InsertToQueue(thread, 1);
     } else if (p >= 50) {
         // L2 queue
-        PJ_ReadyList->Insert(thread);
-        InsertLog(currentTime, thread->getID(), 2);
+        InsertToQueue(thread, 2);
     } else {
         // L3 queue
-        RR_ReadyList->Append(thread);
-        InsertLog(currentTime, thread->getID(), 3);
+        InsertToQueue(thread, 3);
     }
 }
 
@@ -182,9 +179,13 @@ Scheduler::Run (Thread *nextThread, bool finishing)
     oldThread->CheckOverflow();		    // check if the old thread
 					    // had an undetected stack overflow
 
+    int currentTime = kernel->stats->totalTicks;
+    int executionTime = currentTime - oldThread->getStartTime();
+    nextThread->setStartTime(currentTime);
+
     kernel->currentThread = nextThread;  // switch to the next thread
     nextThread->setStatus(RUNNING);      // nextThread is now running
-    
+    SwitchLog(currentTime, oldThread->getID(), nextThread->getID(), executionTime); 
     DEBUG(dbgThread, "Switching from: " << oldThread->getName() << " to: " << nextThread->getName());
     // This is a machine-dependent assembly language routine defined 
     // in switch.s.  You may have to think
@@ -239,6 +240,11 @@ Scheduler::Print()
     readyList->Apply(ThreadPrint);
 }
 
+//----------------------------------------------------------------------
+// Scheduler::Aging
+// 	Check all the thread in list, if they wait more than 1500 ticks,
+//	increase their priority.
+//----------------------------------------------------------------------
 void
 Scheduler::Aging(List<Thread *> *list)
 {
@@ -248,26 +254,132 @@ Scheduler::Aging(List<Thread *> *list)
         Thread* t = iterator->Item();
         cout << "current Time : " << currentTime << endl; 
         if((currentTime - t->getReadyTime()) >= 1500) {
+            int old = t->getPriority();
             t->Aging(AGING);
             t->setReadyTime(currentTime); // reset time ticks.
+            PriorityChangeLog(currentTime, t->getID(), old, t->getPriority());
+            CheckAndMove(t, old);
         }       
     }
 }
 
+
+//----------------------------------------------------------------------
+// Scheduler::InsertToQueue
+// Insert to a specific list and output the insertion infomation.
+//----------------------------------------------------------------------
+void
+Scheduler::InsertToQueue(Thread* t, int level)
+{
+    int currentTime = kernel->stats->totalTicks;
+    if(level == 1) {
+        SJF_ReadyList->Insert(t);
+    } else if(level == 2) {
+        PJ_ReadyList->Insert(t);
+    } else if(level == 3) {
+        RR_ReadyList->Append(t);
+    }
+    InsertLog(currentTime, t->getID(), level);
+}
+
+//----------------------------------------------------------------------
+// Scheduler::RemoveFromQueue
+// Remove from a specific list and output the remove infomation.
+//----------------------------------------------------------------------
+void
+Scheduler::RemoveFromQueue(Thread* t, int level)
+{
+    int currentTime = kernel->stats->totalTicks;
+    if(level == 1) {
+        SJF_ReadyList->Remove(t);
+    } else if(level == 2) {
+        PJ_ReadyList->Remove(t);
+    } else if(level == 3) {
+        RR_ReadyList->Remove(t);
+    }
+    RemoveLog(currentTime, t->getID(), level);
+}
+
+//----------------------------------------------------------------------
+// Scheduler::CheckAndMove
+// Check if a thread need to move to other queue after changing priority
+//----------------------------------------------------------------------
+void 
+Scheduler::CheckAndMove(Thread* t, int oldPriority)
+{
+    int p = t->getPriority();
+    int currentTime = kernel->stats->totalTicks;
+    if(p >= 100 && oldPriority < 100) {
+        // p is either in RR or PJ.
+        if(oldPriority < 50) {
+            RR_ReadyList->Remove(t);
+            RemoveLog(currentTime, t->getID(), 3);
+        } else {
+            PJ_ReadyList->Remove(t);
+            RemoveLog(currentTime, t->getID(), 2);
+        }
+        InsertToQueue(t, 1);
+    } else if( p >= 50) {
+        if(oldPriority < 50) {
+            // if origin t is in RR
+            RemoveFromQueue(t, 3);
+            InsertToQueue(t, 2);
+        } else if(oldPriority > 99) {
+            // origin t is in SJF
+            RemoveFromQueue(t, 1);
+            InsertToQueue(t, 2);
+        }
+    } else {
+        if(oldPriority > 99) {
+            // origin is in SJF, but now move to RR
+            RemoveFromQueue(t, 1);
+            InsertToQueue(t, 3);
+        } else if(oldPriority > 49) {
+            // origin is in PJ, but now move to RR
+            RemoveFromQueue(t, 2);
+            InsertToQueue(t, 3);
+        }
+    }
+}
+
+//----------------------------------------------------------------------
+// Scheduler::InsertLog
+// Obvious.
+//----------------------------------------------------------------------
 void
 Scheduler::InsertLog(int time, int tid, int level) 
 {
     cout << "Tick " << time << ": Thread " << tid << " is inserted into queue L" << level << endl;
 }
 
+//----------------------------------------------------------------------
+// Scheduler::RemoveLog
+// Very obvious.
+//----------------------------------------------------------------------
 void
 Scheduler::RemoveLog(int time, int tid, int level)
 {
     cout << "Tick " << time << ": Thread " << tid << " is removed from queue L" << level << endl;
 }
 
+//----------------------------------------------------------------------
+// Scheduler::SwitchLog
+// Too obvious.
+//----------------------------------------------------------------------
 void
 Scheduler::SwitchLog(int time, int nid, int pid, int executed) 
 {
+    cout << "Tick " << time << ": Thread " << nid << " is now selected for execution" << endl;
+    cout << "Tick " << time << ": Thread " << pid << " is replaced, and it has executed " << executed << " ticks" << endl;
+}
+
+//----------------------------------------------------------------------
+// Scheduler::PriorityChangeLog
+// I AM FABULOUS
+//----------------------------------------------------------------------
+void
+Scheduler::PriorityChangeLog(int time, int tid, int old, int now)
+{
+    cout << "Tick " << time << ": Thread " << tid << " changes its priority from "<< old << " to " << now << endl;
 }
 
