@@ -54,6 +54,7 @@
 // 2015/10/4 : add SC_Write case to do file write task
 // 2015/10/4 : add SC_Close case to close the file 
 // 2015/10/4 : add SC_Read case to do read file task
+// 2015/12/5 : add addr  translation
 // end Record ----------------------------------------------------
 
 void
@@ -89,7 +90,10 @@ ExceptionHandler(ExceptionType which)
 			DEBUG(dbgSys, "Message received.\n");
 			val = kernel->machine->ReadRegister(4);
 			{
-			char *msg = &(kernel->machine->mainMemory[val]);
+			unsigned int pa;
+			char *msg;
+            kernel->currentThread->space->Translate((unsigned int)val, &pa, 0);
+			msg = &(kernel->machine->mainMemory[pa]);
 			cout << msg << endl;
 			}
 			SysHalt();
@@ -98,7 +102,10 @@ ExceptionHandler(ExceptionType which)
 		case SC_Create:
 			val = kernel->machine->ReadRegister(4);
 			{
-			char *filename = &(kernel->machine->mainMemory[val]);
+			unsigned int pa;
+            char *filename;
+            kernel->currentThread->space->Translate((unsigned int)val, &pa, 0);
+            filename = &(kernel->machine->mainMemory[pa]);
 			//cout << filename << endl;
 			status = SysCreate(filename);
 			kernel->machine->WriteRegister(2, (int) status);
@@ -113,8 +120,12 @@ ExceptionHandler(ExceptionType which)
             val = kernel->machine->ReadRegister(4);
             {
             // address translation
-            char *filename = &(kernel->machine->mainMemory[val]);
-            OpenFileId f_id = SysOpen(filename);
+			unsigned int pa;
+            char *filename;
+            OpenFileId f_id;
+            kernel->currentThread->space->Translate((unsigned int)val, &pa, 0);
+            filename = &(kernel->machine->mainMemory[pa]);
+            f_id = SysOpen(filename);
             kernel->machine->WriteRegister(2, (OpenFileId) f_id);
             }
 			kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
@@ -126,9 +137,12 @@ ExceptionHandler(ExceptionType which)
         case SC_Write:
             val = kernel->machine->ReadRegister(4);
             {
-                char *buffer = &(kernel->machine->mainMemory[val]);
+			    unsigned int pa;
+                char *buffer;
                 int   size = (int) kernel->machine->ReadRegister(5);
                 OpenFileId f_id = (int) kernel->machine->ReadRegister(6);
+                kernel->currentThread->space->Translate((unsigned int)val, &pa, 0);
+                buffer = &(kernel->machine->mainMemory[pa]);
                 
                 status = SysWrite(buffer, size, f_id);
                 kernel->machine->WriteRegister(2, (int) status);
@@ -142,9 +156,12 @@ ExceptionHandler(ExceptionType which)
         case SC_Read:
             val = kernel->machine->ReadRegister(4);
             {
-                char *buffer = &(kernel->machine->mainMemory[val]);
+			    unsigned int pa;
+                char *buffer;
                 int   size = (int) kernel->machine->ReadRegister(5);
                 OpenFileId f_id = (int) kernel->machine->ReadRegister(6);
+                kernel->currentThread->space->Translate((unsigned int)val, &pa, 0);
+                buffer = &(kernel->machine->mainMemory[pa]);
                 
                 status = SysRead(buffer, size, f_id);
                 kernel->machine->WriteRegister(2, (int) status);
