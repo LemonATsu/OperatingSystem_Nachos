@@ -112,9 +112,9 @@ Kernel::Initialize()
 
 	
     //currentThread = new Thread("main", threadNum++);		
-    currentThread = new Thread("main", threadNum++);		
+    currentThread = new Thread("main", 0);		
     currentThread->setStatus(RUNNING);
-
+    threadNum += 2;
     stats = new Statistics();		// collect statistics
     interrupt = new Interrupt;		// start up interrupt handling
     scheduler = new Scheduler();	// initialize the ready queue
