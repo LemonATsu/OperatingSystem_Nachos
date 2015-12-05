@@ -23,10 +23,12 @@
 #include "scheduler.h"
 #include "main.h"
 #define AGING 10
+#define REINSERT(LIST, t) LIST ## _ReadyList->Remove(t); LIST ## _ReadyList->Insert(t)
+#define REAPPEND(LIST, t) LIST ## _ReadyList->Remove(t); LIST ## _ReadyList->Append(t)
 
 int SJFCompare(Thread *a, Thread *b) 
 {
-    int ta = a->getBurstTime(),
+    double ta = a->getBurstTime(),
         tb = b->getBurstTime();
 
     if (ta == tb)
@@ -179,13 +181,16 @@ Scheduler::Run (Thread *nextThread, bool finishing)
     oldThread->CheckOverflow();		    // check if the old thread
 					    // had an undetected stack overflow
 
+    // predict next burst time.
     int currentTime = kernel->stats->totalTicks;
     int executionTime = currentTime - oldThread->getStartTime();
-    nextThread->setStartTime(currentTime);
+    double newburst = executionTime / 2 + oldThread->getBurstTime() / 2;
+    oldThread->setBurstTime(newburst);
+    nextThread->setStartTime(currentTime); // set StartTime
 
     kernel->currentThread = nextThread;  // switch to the next thread
     nextThread->setStatus(RUNNING);      // nextThread is now running
-    SwitchLog(currentTime, oldThread->getID(), nextThread->getID(), executionTime); 
+    SwitchLog(currentTime, nextThread->getID(), oldThread->getID(), executionTime); 
     DEBUG(dbgThread, "Switching from: " << oldThread->getName() << " to: " << nextThread->getName());
     // This is a machine-dependent assembly language routine defined 
     // in switch.s.  You may have to think
@@ -199,6 +204,7 @@ Scheduler::Run (Thread *nextThread, bool finishing)
     // interrupts are off when we return from switch!
     ASSERT(kernel->interrupt->getLevel() == IntOff);
 
+    // set next Burst of old thread
     DEBUG(dbgThread, "Now in thread: " << oldThread->getName());
 
     CheckToBeDestroyed();		// check if thread we were running
@@ -308,37 +314,44 @@ void
 Scheduler::CheckAndMove(Thread* t, int oldPriority)
 {
     int p = t->getPriority();
-    int currentTime = kernel->stats->totalTicks;
-    if(p >= 100 && oldPriority < 100) {
-        // p is either in RR or PJ.
+    
+    if(p >= 100) {
         if(oldPriority < 50) {
-            RR_ReadyList->Remove(t);
-            RemoveLog(currentTime, t->getID(), 3);
+            // t is in RR originally.
+            RemoveFromQueue(t, 3);
+        } else if(oldPriority < 100){
+            // t is in PJ.
+            RemoveFromQueue(t, 2);
         } else {
-            PJ_ReadyList->Remove(t);
-            RemoveLog(currentTime, t->getID(), 2);
+            // re-insert it to renew its position.
+            REINSERT(SJF, t);
+            return;
         }
         InsertToQueue(t, 1);
-    } else if( p >= 50) {
+    } else if(p >= 50) {
         if(oldPriority < 50) {
             // if origin t is in RR
             RemoveFromQueue(t, 3);
-            InsertToQueue(t, 2);
         } else if(oldPriority > 99) {
             // origin t is in SJF
             RemoveFromQueue(t, 1);
-            InsertToQueue(t, 2);
+        } else {
+            REINSERT(PJ, t);
+            return;
         }
+        InsertToQueue(t, 2);
     } else {
         if(oldPriority > 99) {
             // origin is in SJF, but now move to RR
             RemoveFromQueue(t, 1);
-            InsertToQueue(t, 3);
         } else if(oldPriority > 49) {
             // origin is in PJ, but now move to RR
             RemoveFromQueue(t, 2);
-            InsertToQueue(t, 3);
+        } else {
+            REAPPEND(RR, t);
+            return;
         }
+        InsertToQueue(t, 3);
     }
 }
 

@@ -116,7 +116,7 @@ class Thread {
     void setReadyTime(int at) { readyTime = at; }
 
     int getBurstTime() { return (burstTime); }
-    void setBurstTime(int length) { burstTime = length; }
+    void setBurstTime(double length) { burstTime = length; }
 
     int getStartTime() { return (startTime); }
     void setStartTime(int when) { startTime = when; }
@@ -139,8 +139,8 @@ class Thread {
     // some of the private data for this class is listed above
     int priority;
     int startTime;
-    int burstTime;
     int readyTime;
+    double burstTime;
 
     int *stack; 	 	// Bottom of the stack 
 				// NULL if this is the main thread
