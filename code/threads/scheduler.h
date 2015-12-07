@@ -7,7 +7,7 @@
 // of liability and disclaimer of warranty provisions.
 
 // 15/12/01: add 3 level queue 
-
+// 15/12/06: add int handler
 
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
@@ -15,10 +15,17 @@
 #include "copyright.h"
 #include "list.h"
 #include "thread.h"
-
+#include "callback.h"
 // The following class defines the scheduler/dispatcher abstraction -- 
 // the data structures and operations needed to keep track of which 
 // thread is running, and which threads are ready but not running.
+
+class SchedulerIntHandler : public CallBackObj {
+  public:
+    //SchedulerIntHandler(CallBackObj *toCall);
+    void CallBack();
+    void Schedule(int time);
+};
 
 class Scheduler {
   public:
@@ -42,12 +49,14 @@ class Scheduler {
     void RemoveLog(int time, int tid, int level);
     void SwitchLog(int time, int nid, int pid, int executed);
     void PriorityChangeLog(int time, int tid, int old, int now);
+    void CallBack();
   private:
     void InsertToQueue(Thread* t, int level);
     void RemoveFromQueue(Thread* t, int level);
     List<Thread *> *readyList;  // queue of threads that are ready to run,
 				// but not running
-
+    
+    SchedulerIntHandler* intHandler;
     SortedList<Thread *> *SJF_ReadyList;
     SortedList<Thread *> *PJ_ReadyList;
     List<Thread *> *RR_ReadyList;
@@ -55,5 +64,6 @@ class Scheduler {
     Thread *toBeDestroyed;	// finishing thread to be destroyed
     				// by the next thread that runs
 };
+
 
 #endif // SCHEDULER_H

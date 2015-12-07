@@ -56,6 +56,7 @@ int PJCompare(Thread *a, Thread *b)
 
 Scheduler::Scheduler()
 { 
+    intHandler = new SchedulerIntHandler();
     readyList = new List<Thread *>; 
     SJF_ReadyList = new SortedList<Thread *>(SJFCompare);
     PJ_ReadyList = new SortedList<Thread *>(PJCompare);
@@ -94,12 +95,16 @@ Scheduler::ReadyToRun (Thread *thread)
     int p = thread->getPriority();
     thread->setStatus(READY);
     thread->setReadyTime(currentTime);
-
+    
     // Insert :: put item into list by order
     // Append :: put item at tail of list
     if(p >= 100) {
         // L1 queue
         InsertToQueue(thread, 1);
+        // Preemptive
+        if(thread->getBurstTime() < kernel->currentThread->getBurstTime()) {
+            intHandler->Schedule(1);
+        }
     } else if (p >= 50) {
         // L2 queue
         InsertToQueue(thread, 2);
@@ -124,6 +129,10 @@ Scheduler::FindNextToRun ()
     ASSERT(kernel->interrupt->getLevel() == IntOff);
     int currentTime = kernel->stats->totalTicks;
     Thread* t = NULL;
+    Aging(SJF_ReadyList);
+    Aging(PJ_ReadyList);
+    Aging(RR_ReadyList);
+
     if(!(SJF_ReadyList->IsEmpty())) {
 
         t = SJF_ReadyList->RemoveFront();
@@ -187,7 +196,7 @@ Scheduler::Run (Thread *nextThread, bool finishing)
     double newburst = executionTime / 2 + oldThread->getBurstTime() / 2;
     oldThread->setBurstTime(newburst);
     nextThread->setStartTime(currentTime); // set StartTime
-
+    
     kernel->currentThread = nextThread;  // switch to the next thread
     nextThread->setStatus(RUNNING);      // nextThread is now running
     SwitchLog(currentTime, nextThread->getID(), oldThread->getID(), executionTime); 
@@ -204,7 +213,6 @@ Scheduler::Run (Thread *nextThread, bool finishing)
     // interrupts are off when we return from switch!
     ASSERT(kernel->interrupt->getLevel() == IntOff);
 
-    // set next Burst of old thread
     DEBUG(dbgThread, "Now in thread: " << oldThread->getName());
 
     CheckToBeDestroyed();		// check if thread we were running
@@ -258,7 +266,7 @@ Scheduler::Aging(List<Thread *> *list)
     for(; !(iterator->IsDone()); iterator->Next()) {
         int currentTime = kernel->stats->totalTicks;
         Thread* t = iterator->Item();
-        cout << "current Time : " << currentTime << endl; 
+        
         if((currentTime - t->getReadyTime()) >= 1500) {
             int old = t->getPriority();
             t->Aging(AGING);
@@ -394,5 +402,16 @@ void
 Scheduler::PriorityChangeLog(int time, int tid, int old, int now)
 {
     cout << "Tick " << time << ": Thread " << tid << " changes its priority from "<< old << " to " << now << endl;
+}
+
+void
+SchedulerIntHandler::CallBack()
+{
+    kernel->interrupt->YieldOnReturn();
+}
+void
+SchedulerIntHandler::Schedule(int time)
+{
+    kernel->interrupt->Schedule(this, time, TimerInt);
 }
 
