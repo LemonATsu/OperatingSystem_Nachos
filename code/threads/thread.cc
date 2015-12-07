@@ -199,7 +199,6 @@ Thread::Finish ()
 {
     (void) kernel->interrupt->SetLevel(IntOff);		
     ASSERT(this == kernel->currentThread);
-    
     DEBUG(dbgThread, "Finishing thread: " << name);
     Sleep(TRUE);				// invokes SWITCH
     // not reached
@@ -238,8 +237,10 @@ Thread::Yield ()
     nextThread = kernel->scheduler->FindNextToRun();
     
     if (nextThread != NULL) {
-    //kernel->scheduler->ReadyToRun(this);
-	kernel->scheduler->Run(nextThread, FALSE);
+	   // if(nextThread->getID() != this->getID())
+            kernel->scheduler->Run(nextThread, FALSE);
+        //else
+        //    cout << name << " will keep running" << endl;
     }
     (void) kernel->interrupt->SetLevel(oldLevel);
 }
@@ -273,7 +274,6 @@ Thread::Sleep (bool finishing)
     ASSERT(kernel->interrupt->getLevel() == IntOff);
     
     //DEBUG(dbgThread, "Sleeping thread: " << name);
-    
     status = BLOCKED;
 	//cout << "debug Thread::Sleep " << name << "wait for Idle\n";
     while ((nextThread = kernel->scheduler->FindNextToRun()) == NULL) {
