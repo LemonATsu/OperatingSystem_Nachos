@@ -201,17 +201,9 @@ Scheduler::Run (Thread *nextThread, bool finishing)
 
     // predict next burst time.
     int currentTime = kernel->stats->totalTicks;
-    int lastBurst = oldThread->getLastBurst();
     int executionTime = currentTime - oldThread->getStartTime();
-    double newburst = (executionTime + lastBurst + oldThread->getBurstTime()) / 2;
+    UpdateBurstTime(oldThread, currentTime);
     
-    if(!oldThread->isPreempted()) {
-        oldThread->setBurstTime(newburst);
-        oldThread->resetLastBurst();
-    } else {
-        oldThread->setLastBurst(executionTime);
-        oldThread->resetPreempt();
-    }
     nextThread->setStartTime(currentTime); // set StartTime
     kernel->currentThread = nextThread;  // switch to the next thread
     nextThread->setStatus(RUNNING);      // nextThread is now running
@@ -378,6 +370,30 @@ Scheduler::CheckAndMove(Thread* t, int oldPriority)
         InsertToQueue(t, 3);
     }
 }
+
+void
+Scheduler::UpdateBurstTime(Thread *t, int currentTime)
+{
+    int lastBurst = t->getLastBurst();
+    int executionTime = currentTime - t->getStartTime();
+    double newBurst = (executionTime + lastBurst + t->getBurstTime()) / 2;
+
+    if(!t->hasBursted()) {
+        cout << "It's first burst." << endl;
+        t->setBursted();
+        t->setBurstTime(executionTime);
+        return;
+    }
+
+    if(!t->isPreempted()) {
+        t->setBurstTime(newBurst);
+        t->resetLastBurst();
+    } else {
+        t->setLastBurst(executionTime);
+        t->resetPreempt();
+    }
+}
+
 
 //----------------------------------------------------------------------
 // Scheduler::InsertLog

@@ -43,7 +43,7 @@ class Scheduler {
     void Print();		// Print contents of ready list
     void CheckAndMove(Thread* t, int oldPriority);    
     // SelfTest for scheduler is implemented in class Thread
-   
+    void UpdateBurstTime(Thread *t, int currentTime);   
     void Aging(List<Thread *> *list);
     void InsertLog(int time, int tid, int level);
     void RemoveLog(int time, int tid, int level);
