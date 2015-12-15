@@ -138,9 +138,9 @@ Scheduler::FindNextToRun ()
     ASSERT(kernel->interrupt->getLevel() == IntOff);
     int currentTime = kernel->stats->totalTicks;
     Thread* t = NULL;
-    Aging(SJF_ReadyList);
-    Aging(PJ_ReadyList);
     Aging(RR_ReadyList);
+    Aging(PJ_ReadyList);
+    Aging(SJF_ReadyList);
 
     if(!(SJF_ReadyList->IsEmpty())) {
 
