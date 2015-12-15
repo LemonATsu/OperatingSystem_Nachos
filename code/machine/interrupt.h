@@ -59,7 +59,7 @@ enum MachineStatus {IdleMode, SystemMode, UserMode};
 // In Nachos, we support a hardware timer device, a disk, a console
 // display and keyboard, and a network.
 enum IntType { TimerInt, DiskInt, ConsoleWriteInt, ConsoleReadInt, 
-			NetworkSendInt, NetworkRecvInt};
+			NetworkSendInt, NetworkRecvInt, SwitchInt};
 
 // The following class defines an interrupt that is scheduled
 // to occur in the future.  The internal data structures are
@@ -132,6 +132,7 @@ class Interrupt {
     				// by the hardware device simulators.
     
     void OneTick();       	// Advance simulated time
+    void SliceForward();
 
   private:
     IntStatus level;		// are interrupts enabled or disabled?

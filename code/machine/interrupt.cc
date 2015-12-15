@@ -169,7 +169,6 @@ Interrupt::OneTick()
 	stats->userTicks += UserTick;
     }
     DEBUG(dbgInt, "== Tick " << stats->totalTicks << " ==");
-
 // check any pending interrupts are now ready to fire
     ChangeLevel(IntOn, IntOff);	// first, turn off interrupts
 				// (interrupt handlers run with
@@ -180,7 +179,8 @@ Interrupt::OneTick()
     				// for a context switch, ok to do it now
 	yieldOnReturn = FALSE;
  	status = SystemMode;		// yield is a kernel routine
-	kernel->currentThread->Yield();
+	cout << "Gonna yield on return" << endl; 
+    kernel->currentThread->Yield();
 	status = oldStatus;
     }
 }
@@ -447,5 +447,30 @@ void
 Interrupt::PrintInt(int number)
 {
     kernel->PrintInt(number);
+}
+
+//----------------------------------------------------------------------
+// SliceForward
+// 	To fix the stupid Nachos RR design flaws.
+//	If a thread is put to sleep, the next thread will use its timeslice,
+//	so it will not execute fully 500 ticks.
+//----------------------------------------------------------------------
+void
+Interrupt::SliceForward()
+{
+    int currentTime = kernel->stats->totalTicks;
+
+    ListIterator<PendingInterrupt *> *iterator = new ListIterator<PendingInterrupt *>(pending);
+    // find the first timer int and stop it.
+    for(; !(iterator->IsDone()); iterator->Next()) {
+        if(iterator->Item()->type == TimerInt) {
+            if(iterator->Item()->when > currentTime) {
+                int advance = TimerTicks - (iterator->Item()->when - currentTime);
+                iterator->Item()->when += advance;
+                cout << "Slice forward : " << iterator->Item()->when << " " << advance << endl;
+                break;
+            }
+        }
+    }
 }
 
