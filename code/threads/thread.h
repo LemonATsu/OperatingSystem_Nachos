@@ -142,7 +142,7 @@ class Thread {
     void setLastBurst(int length) { lastBurst = length; cout << "last burst : " << length << endl;}
     void resetLastBurst() { lastBurst = 0; }
     bool hasBursted() { return bursted > 0; }
-    void setBursted() { bursted = true; }
+    void setBursted() { bursted = 1; }
   private:
     // some of the private data for this class is listed above
     int bursted;
