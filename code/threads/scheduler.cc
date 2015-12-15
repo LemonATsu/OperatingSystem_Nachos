@@ -32,7 +32,7 @@ int SJFCompare(Thread *a, Thread *b)
         tb = b->getBurstTime();
 
     if (ta == tb)
-        return 0;
+        return a->getID() > b->getID() ? 1 : -1;
     return ta > tb ? 1 : -1;
 }
 
@@ -91,23 +91,32 @@ Scheduler::ReadyToRun (Thread *thread)
 {
     ASSERT(kernel->interrupt->getLevel() == IntOff);
     //DEBUG(dbgThread, "Putting thread on ready list: " << thread->getName());
+    Thread* curThread = kernel->currentThread;
     int currentTime = kernel->stats->totalTicks;
     int p = thread->getPriority();
+    int curBurst = curThread->getBurstTime() - curThread->getLastBurst()
+                    - (currentTime - curThread->getStartTime());
     thread->setStatus(READY);
     thread->setReadyTime(currentTime);
-    
     // Insert :: put item into list by order
     // Append :: put item at tail of list
     if(p >= 100) {
         // L1 queue
         InsertToQueue(thread, 1);
         // Preemptive
-        if(thread->getBurstTime() < kernel->currentThread->getBurstTime()) {
+        if(thread->getBurstTime() < curBurst) {
+            cout << "old : " << curThread->getBurstTime() << endl;
+            cout << "new : " << thread->getBurstTime() << endl;
+            curThread->Preempt();
             intHandler->Schedule(1);
         }
     } else if (p >= 50) {
         // L2 queue
         InsertToQueue(thread, 2);
+        if(thread->getPriority() > curThread->getPriority()) {
+            curThread->Preempt();
+            intHandler->Schedule(1);
+        }
     } else {
         // L3 queue
         InsertToQueue(thread, 3);
@@ -192,11 +201,18 @@ Scheduler::Run (Thread *nextThread, bool finishing)
 
     // predict next burst time.
     int currentTime = kernel->stats->totalTicks;
+    int lastBurst = oldThread->getLastBurst();
     int executionTime = currentTime - oldThread->getStartTime();
-    double newburst = executionTime / 2 + oldThread->getBurstTime() / 2;
-    oldThread->setBurstTime(newburst);
-    nextThread->setStartTime(currentTime); // set StartTime
+    double newburst = (executionTime + lastBurst + oldThread->getBurstTime()) / 2;
     
+    if(!oldThread->isPreempted()) {
+        oldThread->setBurstTime(newburst);
+        oldThread->resetLastBurst();
+    } else {
+        oldThread->setLastBurst(executionTime);
+        oldThread->resetPreempt();
+    }
+    nextThread->setStartTime(currentTime); // set StartTime
     kernel->currentThread = nextThread;  // switch to the next thread
     nextThread->setStatus(RUNNING);      // nextThread is now running
     SwitchLog(currentTime, nextThread->getID(), oldThread->getID(), executionTime); 
@@ -412,6 +428,6 @@ SchedulerIntHandler::CallBack()
 void
 SchedulerIntHandler::Schedule(int time)
 {
-    kernel->interrupt->Schedule(this, time, TimerInt);
+    kernel->interrupt->Schedule(this, time, SwitchInt);
 }
 
