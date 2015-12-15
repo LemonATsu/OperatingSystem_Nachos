@@ -42,7 +42,8 @@ int PJCompare(Thread *a, Thread *b)
         pb = a->getPriority();
 
     if(pa == pb)
-        return 0;
+//        return 0;
+        return a->getID() > b->getID() ? 1 : -1;
     return pa > pb ? -1 : 1;
 }
 
@@ -96,6 +97,7 @@ Scheduler::ReadyToRun (Thread *thread)
     int p = thread->getPriority();
     int curBurst = curThread->getBurstTime() - curThread->getLastBurst()
                     - (currentTime - curThread->getStartTime());
+    curBurst = curBurst >= 0 ? curBurst : 0;
     thread->setStatus(READY);
     thread->setReadyTime(currentTime);
     // Insert :: put item into list by order
@@ -114,6 +116,7 @@ Scheduler::ReadyToRun (Thread *thread)
         // L2 queue
         InsertToQueue(thread, 2);
         if(thread->getPriority() > curThread->getPriority()) {
+            //cout << "in:" << thread->getPriority() << " cur:" << curThread->getPriority() << endl;
             curThread->Preempt();
             intHandler->Schedule(1);
         }
@@ -138,10 +141,8 @@ Scheduler::FindNextToRun ()
     ASSERT(kernel->interrupt->getLevel() == IntOff);
     int currentTime = kernel->stats->totalTicks;
     Thread* t = NULL;
-    Aging(SJF_ReadyList);
-    Aging(PJ_ReadyList);
-    Aging(RR_ReadyList);
 
+    
     if(!(SJF_ReadyList->IsEmpty())) {
 
         t = SJF_ReadyList->RemoveFront();
@@ -158,6 +159,10 @@ Scheduler::FindNextToRun ()
         RemoveLog(currentTime, t->getID(), 3);
 
     }
+    
+    Aging(SJF_ReadyList);
+    Aging(PJ_ReadyList);
+    Aging(RR_ReadyList);
 
     return t;
 }
@@ -378,12 +383,6 @@ Scheduler::UpdateBurstTime(Thread *t, int currentTime)
     int executionTime = currentTime - t->getStartTime();
     double newBurst = (executionTime + lastBurst + t->getBurstTime()) / 2;
 
-    if(!t->hasBursted()) {
-        cout << "It's first burst." << endl;
-        t->setBursted();
-        t->setBurstTime(executionTime);
-        return;
-    }
 
     if(!t->isPreempted()) {
         t->setBurstTime(newBurst);
@@ -391,6 +390,12 @@ Scheduler::UpdateBurstTime(Thread *t, int currentTime)
     } else {
         t->setLastBurst(executionTime);
         t->resetPreempt();
+    }
+    
+    if(!t->hasBursted()) {
+        //cout << "It's first burst." << endl;
+        t->setBursted();
+        t->setBurstTime(executionTime);
     }
 }
 
