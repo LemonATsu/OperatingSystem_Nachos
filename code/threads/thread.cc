@@ -280,11 +280,11 @@ Thread::Sleep (bool finishing)
     //DEBUG(dbgThread, "Sleeping thread: " << name);
     status = BLOCKED;
 	//cout << "debug Thread::Sleep " << name << "wait for Idle\n";
+    kernel->interrupt->SliceForward();
     while ((nextThread = kernel->scheduler->FindNextToRun()) == NULL) {
 		kernel->interrupt->Idle();	// no one to run, wait for an interrupt
 	}    
     // returns when it's time for us to run
-    kernel->interrupt->SliceForward();
     kernel->scheduler->Run(nextThread, finishing); 
 }
 
@@ -479,3 +479,4 @@ Thread::SelfTest()
     kernel->currentThread->Yield();
     SimpleThread(0);
 }
+

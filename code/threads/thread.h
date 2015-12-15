@@ -140,9 +140,12 @@ class Thread {
     int isPreempted() { return (preempted); }
     int getLastBurst() { return (lastBurst); }
     void setLastBurst(int length) { lastBurst = length; cout << "last burst : " << length << endl;}
-    int resetLastBurst() { lastBurst = 0; }
+    void resetLastBurst() { lastBurst = 0; }
+    bool hasBursted() { return bursted > 0; }
+    void setBursted() { bursted = true; }
   private:
     // some of the private data for this class is listed above
+    int bursted;
     int priority;
     int startTime;
     int readyTime;
