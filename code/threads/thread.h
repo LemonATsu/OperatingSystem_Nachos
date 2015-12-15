@@ -135,13 +135,20 @@ class Thread {
         }
     }
 
+    void Preempt();
+    void resetPreempt();
+    int isPreempted() { return (preempted); }
+    int getLastBurst() { return (lastBurst); }
+    void setLastBurst(int length) { lastBurst = length; cout << "last burst : " << length << endl;}
+    int resetLastBurst() { lastBurst = 0; }
   private:
     // some of the private data for this class is listed above
     int priority;
     int startTime;
     int readyTime;
     double burstTime;
-
+    int preempted; // if preempted by a higher priority one.
+    int lastBurst; // The time it consume before it switch out by a higher priority one. 
     int *stack; 	 	// Bottom of the stack 
 				// NULL if this is the main thread
 				// (If NULL, don't deallocate stack)

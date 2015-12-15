@@ -41,6 +41,8 @@ Thread::Thread(char* threadName, int threadID)
 	ID = threadID;
     name = threadName;
     priority = 151;   
+    lastBurst = 0;
+    preempted = 0;
     stackTop = NULL;
     stack = NULL;
     status = JUST_CREATED;
@@ -64,6 +66,8 @@ Thread::Thread(char* threadName, int threadID, int prior)
 	ID = threadID;
     name = threadName;
     priority = prior;
+    lastBurst = 0;
+    preempted = 0;
     stackTop = NULL;
     stack = NULL;
     status = JUST_CREATED;
@@ -232,12 +236,12 @@ Thread::Yield ()
     ASSERT(this == kernel->currentThread);
     
     DEBUG(dbgThread, "Yielding thread: " << name);
-    
+    //cout << "Yielding  " << name << endl;    
     kernel->scheduler->ReadyToRun(this);
     nextThread = kernel->scheduler->FindNextToRun();
     
     if (nextThread != NULL) {
-	   // if(nextThread->getID() != this->getID())
+	    if(nextThread->getID() != this->getID())
             kernel->scheduler->Run(nextThread, FALSE);
         //else
         //    cout << name << " will keep running" << endl;
@@ -280,6 +284,7 @@ Thread::Sleep (bool finishing)
 		kernel->interrupt->Idle();	// no one to run, wait for an interrupt
 	}    
     // returns when it's time for us to run
+    kernel->interrupt->SliceForward();
     kernel->scheduler->Run(nextThread, finishing); 
 }
 
@@ -424,6 +429,19 @@ Thread::RestoreUserState()
 	kernel->machine->WriteRegister(i, userRegisters[i]);
 }
 
+
+void
+Thread::Preempt()
+{
+    ASSERT(preempted == 0); 
+    preempted = 1;
+}
+
+void
+Thread::resetPreempt() {
+    ASSERT(preempted == 1); 
+    preempted = 0;
+}
 
 //----------------------------------------------------------------------
 // SimpleThread
