@@ -343,7 +343,7 @@ Scheduler::CheckAndMove(Thread* t, int oldPriority)
     // it is entering/leaving the L2 queue
     if(oldPriority < 50 && p >= 50) {
         RemoveFromQueue(t, 3);
-    } else if(oldPriority < 100 && p >= 100) {
+    } else if(oldPriority < 100 && p >= 50) {
         RemoveFromQueue(t, 2);
     } else {
         return;
