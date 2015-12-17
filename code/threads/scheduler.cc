@@ -335,45 +335,18 @@ void
 Scheduler::CheckAndMove(Thread* t, int oldPriority)
 {
     int p = t->getPriority();
-    
-    if(p >= 100) {
-        if(oldPriority < 50) {
-            // t is in RR originally.
-            RemoveFromQueue(t, 3);
-        } else if(oldPriority < 100){
-            // t is in PJ.
-            RemoveFromQueue(t, 2);
-        } else {
-            // re-insert it to renew its position.
-            REINSERT(SJF, t);
-            return;
-        }
-        InsertToQueue(t, 1);
-    } else if(p >= 50) {
-        if(oldPriority < 50) {
-            // if origin t is in RR
-            RemoveFromQueue(t, 3);
-        } else if(oldPriority > 99) {
-            // origin t is in SJF
-            RemoveFromQueue(t, 1);
-        } else {
-            REINSERT(PJ, t);
-            return;
-        }
-        InsertToQueue(t, 2);
+    // Priority only influence the order in L2 queue.
+    // So, we only remove it from original queue when
+    // it is entering/leaving the L2 queue
+    if(oldPriority < 50 && p >= 50) {
+        RemoveFromQueue(t, 3);
+    } else if(oldPriority < 100 && p >= 100) {
+        RemoveFromQueue(t, 2);
     } else {
-        if(oldPriority > 99) {
-            // origin is in SJF, but now move to RR
-            RemoveFromQueue(t, 1);
-        } else if(oldPriority > 49) {
-            // origin is in PJ, but now move to RR
-            RemoveFromQueue(t, 2);
-        } else {
-            REAPPEND(RR, t);
-            return;
-        }
-        InsertToQueue(t, 3);
+        return;
     }
+
+    ReadyToRun(t);
 }
 
 void
