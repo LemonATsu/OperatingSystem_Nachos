@@ -179,7 +179,7 @@ Interrupt::OneTick()
     				// for a context switch, ok to do it now
 	yieldOnReturn = FALSE;
  	status = SystemMode;		// yield is a kernel routine
-	cout << "Gonna yield on return" << endl; 
+	//cout << "Gonna yield on return" << endl; 
     kernel->currentThread->Yield();
 	status = oldStatus;
     }

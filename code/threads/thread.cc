@@ -236,12 +236,11 @@ Thread::Yield ()
     ASSERT(this == kernel->currentThread);
     
     DEBUG(dbgThread, "Yielding thread: " << name);
-    //cout << "Yielding  " << name << endl;    
     kernel->scheduler->ReadyToRun(this);
     nextThread = kernel->scheduler->FindNextToRun();
     
     if (nextThread != NULL) {
-	    if(nextThread->getID() != this->getID())
+        if(nextThread->getID() != this->getID())
             kernel->scheduler->Run(nextThread, FALSE);
         //else
         //    cout << name << " will keep running" << endl;
