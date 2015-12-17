@@ -39,8 +39,7 @@ int SJFCompare(Thread *a, Thread *b)
 int PJCompare(Thread *a, Thread *b)
 {
     int pa = a->getPriority(),
-        pb = a->getPriority();
-
+        pb = b->getPriority();
     if(pa == pb)
 //        return 0;
         return a->getID() > b->getID() ? 1 : -1;
@@ -100,6 +99,7 @@ Scheduler::ReadyToRun (Thread *thread)
     curBurst = curBurst >= 0 ? curBurst : 0;
     thread->setStatus(READY);
     thread->setReadyTime(currentTime);
+
     // Insert :: put item into list by order
     // Append :: put item at tail of list
     if(p >= 100) {
@@ -107,18 +107,21 @@ Scheduler::ReadyToRun (Thread *thread)
         InsertToQueue(thread, 1);
         // Preemptive
         if(thread->getBurstTime() < curBurst) {
+            cout << "Preempt (burst time)" << endl;
             cout << "old : " << curThread->getBurstTime() << endl;
             cout << "new : " << thread->getBurstTime() << endl;
             curThread->Preempt();
-            intHandler->Schedule(1);
+            intHandler->Schedule(5);
         }
     } else if (p >= 50) {
         // L2 queue
         InsertToQueue(thread, 2);
         if(thread->getPriority() > curThread->getPriority()) {
-            //cout << "in:" << thread->getPriority() << " cur:" << curThread->getPriority() << endl;
+            cout << "Preempt (priority)" << endl;
+            cout << "old : " << curThread->getPriority() << endl;
+            cout << "new : " << thread->getPriority() << endl;
             curThread->Preempt();
-            intHandler->Schedule(1);
+            intHandler->Schedule(5);
         }
     } else {
         // L3 queue
