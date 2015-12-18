@@ -467,7 +467,7 @@ Interrupt::SliceForward()
             if(iterator->Item()->when > currentTime) {
                 int advance = TimerTicks - (iterator->Item()->when - currentTime);
                 iterator->Item()->when += advance;
-                cout << "Slice forward : " << iterator->Item()->when << " " << advance << endl;
+                cout << "Tick " << currentTime  << ": Slice forward to " << iterator->Item()->when << endl;
                 break;
             }
         }
