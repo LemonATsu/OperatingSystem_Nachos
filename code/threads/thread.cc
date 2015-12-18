@@ -272,16 +272,17 @@ void
 Thread::Sleep (bool finishing)
 {
     Thread *nextThread;
-    
+    int currentTime = kernel->stats->totalTicks;
     ASSERT(this == kernel->currentThread);
     ASSERT(kernel->interrupt->getLevel() == IntOff);
     
     //DEBUG(dbgThread, "Sleeping thread: " << name);
     status = BLOCKED;
-	//cout << "debug Thread::Sleep " << name << "wait for Idle\n";
+	cout << "Tick "<< currentTime << ": Thread " << ID << " sleep" << endl;
+    kernel->scheduler->UpdateBurstTime(this, kernel->stats->totalTicks);
     kernel->interrupt->SliceForward();
     while ((nextThread = kernel->scheduler->FindNextToRun()) == NULL) {
-		kernel->interrupt->Idle();	// no one to run, wait for an interrupt
+        kernel->interrupt->Idle();	// no one to run, wait for an interrupt
 	}    
     // returns when it's time for us to run
     kernel->scheduler->Run(nextThread, finishing); 
@@ -432,13 +433,11 @@ Thread::RestoreUserState()
 void
 Thread::Preempt()
 {
-    ASSERT(preempted == 0); 
     preempted = 1;
 }
 
 void
 Thread::resetPreempt() {
-    ASSERT(preempted == 1); 
     preempted = 0;
 }
 

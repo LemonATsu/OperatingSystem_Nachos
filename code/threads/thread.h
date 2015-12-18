@@ -139,7 +139,7 @@ class Thread {
     void resetPreempt();
     int isPreempted() { return (preempted); }
     int getLastBurst() { return (lastBurst); }
-    void setLastBurst(int length) { lastBurst = length; cout << "last burst : " << length << endl;}
+    void addLastBurst(int length) { lastBurst += length; cout << "last burst : " << lastBurst << endl;}
     void resetLastBurst() { lastBurst = 0; }
     bool hasBursted() { return bursted > 0; }
     void setBursted() { bursted = 1; }
