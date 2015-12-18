@@ -365,13 +365,14 @@ Scheduler::UpdateBurstTime(Thread *t, int currentTime)
 
 
     t->setBurstTime(newBurst);
-    t->resetLastBurst();
     
     if(!t->hasBursted()) {
         //cout << "It's first burst." << endl;
         t->setBursted();
-        t->setBurstTime(executionTime);
+        t->setBurstTime(executionTime + lastBurst);
     }
+    
+    t->resetLastBurst();
 
     cout << "Tick " << currentTime << ": Thread " << t->getID() << " has nextBurst : " << t->getBurstTime() << endl;
 }
