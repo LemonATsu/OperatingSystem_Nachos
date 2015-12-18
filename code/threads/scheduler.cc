@@ -210,7 +210,12 @@ Scheduler::Run (Thread *nextThread, bool finishing)
     // predict next burst time.
     int currentTime = kernel->stats->totalTicks;
     int executionTime = currentTime - oldThread->getStartTime();
-    
+   
+    if(oldThread->isPreempted()) {
+        oldThread->addLastBurst(executionTime);
+        oldThread->resetPreempt();
+    }
+
     nextThread->setStartTime(currentTime); // set StartTime
     kernel->currentThread = nextThread;  // switch to the next thread
     nextThread->setStatus(RUNNING);      // nextThread is now running
@@ -359,13 +364,8 @@ Scheduler::UpdateBurstTime(Thread *t, int currentTime)
     double newBurst = (executionTime + lastBurst + t->getBurstTime()) / 2;
 
 
-    if(!t->isPreempted()) {
-        t->setBurstTime(newBurst);
-        t->resetLastBurst();
-    } else {
-        t->addLastBurst(executionTime);
-        t->resetPreempt();
-    }
+    t->setBurstTime(newBurst);
+    t->resetLastBurst();
     
     if(!t->hasBursted()) {
         //cout << "It's first burst." << endl;
