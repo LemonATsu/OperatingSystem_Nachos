@@ -108,7 +108,7 @@ Scheduler::ReadyToRun (Thread *thread)
         // Preemptive
         if(thread->getBurstTime() < curBurst) {
             cout << "Preempt (burst time)" << endl;
-            cout << "old : " << curThread->getBurstTime() << endl;
+            cout << "old : " << curBurst << endl;
             cout << "new : " << thread->getBurstTime() << endl;
             curThread->Preempt();
             intHandler->Schedule(5);
@@ -210,7 +210,6 @@ Scheduler::Run (Thread *nextThread, bool finishing)
     // predict next burst time.
     int currentTime = kernel->stats->totalTicks;
     int executionTime = currentTime - oldThread->getStartTime();
-    UpdateBurstTime(oldThread, currentTime);
     
     nextThread->setStartTime(currentTime); // set StartTime
     kernel->currentThread = nextThread;  // switch to the next thread
@@ -364,7 +363,7 @@ Scheduler::UpdateBurstTime(Thread *t, int currentTime)
         t->setBurstTime(newBurst);
         t->resetLastBurst();
     } else {
-        t->setLastBurst(executionTime);
+        t->addLastBurst(executionTime);
         t->resetPreempt();
     }
     
@@ -373,6 +372,8 @@ Scheduler::UpdateBurstTime(Thread *t, int currentTime)
         t->setBursted();
         t->setBurstTime(executionTime);
     }
+
+    cout << "Tick " << currentTime << ": Thread " << t->getID() << " has nextBurst : " << t->getBurstTime() << endl;
 }
 
 
