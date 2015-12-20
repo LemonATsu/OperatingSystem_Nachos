@@ -240,8 +240,14 @@ Thread::Yield ()
     nextThread = kernel->scheduler->FindNextToRun();
     
     if (nextThread != NULL) {
-        if(nextThread->getID() != this->getID())
-            kernel->scheduler->Run(nextThread, FALSE);
+        if(nextThread->getID() != this->getID()) {
+            if(this->priority >= 100 && !this->preempted) {
+               kernel->scheduler->RemoveFromQueue(this, 1);
+               kernel->scheduler->ReadyToRun(nextThread);
+            } else {
+                kernel->scheduler->Run(nextThread, FALSE);
+            }
+        }   
         //else
         //    cout << name << " will keep running" << endl;
     }
